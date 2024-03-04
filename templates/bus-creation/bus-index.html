@@ -1,0 +1,723 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Bus Index{% endblock title %}
+
+{% block bus-index %}
+<div class="container-fluid bus-container p-1 m-0">
+    <div class="card bg-blur pb-3 border text-light" style="height: 98vh; overflow-y: auto;">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <div class="container-fluid text-center  home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+        </div>
+        <div class=" p-3 bg-blur border-bottom ">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 mt-2">
+                        <h5 class="text-center ">BUS MANAGEMENT</h5>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <button type="button" class="btn btn-custom create-btn btn-sm">
+                            CREATE BUS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-blur border text-light mt-2 mx-2" style="height: 600px; overflow-y: auto; ">
+            <div class="card-header text-center border-bottom">
+                <h5 class="card-title">BUS MANAGEMENT</h5>
+            </div>
+            <div class="card-body">
+                {% if buses %}
+                <table
+                    class="table text-center table-bordered admin-table rounded-2 table-dark table-hover table-striped"
+                    style="max-height: 250px; overflow: auto;">
+                    <thead>
+                        <tr>
+                            <th>Bus Number</th>
+                            <th>Bus Name</th>
+                            <th>Bus Type</th>
+                            <th>Starting Point</th>
+                            <th>Ending Point</th>
+                            <th>Journey Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bus in buses %}
+                        <tr>
+                            <td>{{ bus.bus_number }}</td>
+                            <td>{{ bus.bus_name }}</td>
+                            <td>{{ bus.bus_type }}</td>
+                            <td>{{ bus.start_point }}</td>
+                            <td>{{ bus.end_point }}</td>
+                            <td>{{ bus.journey_date }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Bus Actions">
+                                    <button class="btn btn-info display-btn me-1" data-id="{{ bus.id }}"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="btn btn-info display-loader-btn d-none me-1 rounded-start-2"
+                                        type="button" disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <!--  -->
+                                    <button class="btn btn-warning edit-btn me-1" data-id="{{ bus.id }}"><i
+                                            class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn btn-warning edit-loader-btn d-none me-1" type="button" disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <!--  -->
+                                    <button class="btn btn-danger delete-loader-btn d-none rounded-end-2" type="button"
+                                        disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <button class="btn btn-danger delete-btn" data-id="{{ bus.id }}"><i
+                                            class="fa-regular fa-trash-can"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="container-fluid p-5">
+                    <div class="card bg-dark text-light shadow-lg text-center p-5">
+                        <h5>Please create a bus.</h5>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="CreateModal" tabindex="-1" role="dialog" aria-labelledby="CreateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">CREATE BUS</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'create-bus' %}" method="POST" id="Create-form" class="create-form">
+                    {% csrf_token %}
+                    <!--  -->
+                    <div class="mb-3">
+                        <div class="form-floating mb-3">
+                            <input required type="text" class="form-control" id="bus_name" name="bus_name"
+                                placeholder="Bus Name">
+                            <label for="bus_name">Bus Name</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="bus_number" name="bus_number"
+                                        placeholder="Bus Number">
+                                    <label for="bus_number">Bus Number</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="date" class="form-control" id="journey_date"
+                                        name="journey_date" placeholder="Journey Date">
+                                    <label for="journey_date">Journey Date</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="text" class="form-control" id="start_point" name="start_point"
+                                        placeholder="Start Point">
+                                    <label for="start_point">Start Point</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="max_seats" name="max_seats"
+                                        placeholder="Max Seats">
+                                    <label for="max_seats">Max Seats</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="busType" name="bus_type" required>
+                                        <option value="" selected disabled>Select Bus Type</option>
+                                        {% for bus_type in bus_types %}
+                                        <option value="{{ bus_type.0 }}">{{ bus_type.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Bus Type</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="fare" name="fare"
+                                        placeholder="Fare">
+                                    <label for="fare">Fare</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="text" class="form-control" id="end_point" name="end_point"
+                                        placeholder="Ending Point">
+                                    <label for="end_point">End Point</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="booking_limit"
+                                        name="booking_limit" placeholder="Booking Limit">
+                                    <label for="booking_limit">Booking Limit ( Per User )</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="text-light p-0 m-0">
+                    <div class="d-flex align-content-end justify-content-end pt-2">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-custom">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content bg-dark ">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="exampleModalLabel">UPDATE BUS</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="Edit-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="hidden" class="form-control" name="edit_bus_id" placeholder="Bus Id">
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-floating mb-3">
+                            <input required type="text" class="form-control" id="bus_name" name="edit_bus_name"
+                                placeholder="Bus Name">
+                            <label for="bus_name">Bus Name</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="bus_number"
+                                        name="edit_bus_number" placeholder="Bus Number">
+                                    <label for="bus_number">Bus Number</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="date" class="form-control" id="journey_date"
+                                        name="edit_journey_date" placeholder="Journey Date">
+                                    <label for="journey_date">Journey Date</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="text" class="form-control" id="start_point"
+                                        name="edit_start_point" placeholder="Start Point">
+                                    <label for="start_point">Start Point</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="max_seats"
+                                        name="edit_max_seats" placeholder="Max Seats">
+                                    <label for="max_seats">Max Seats</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="busType" name="edit_bus_type" required>
+                                        <option value="" selected disabled>Select Bus Type</option>
+                                        {% for bus_type in bus_types %}
+                                        <option value="{{ bus_type.0 }}">{{ bus_type.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Bus Type</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="fare" name="edit_fare"
+                                        placeholder="Fare">
+                                    <label for="fare">Fare</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="text" class="form-control" id="end_point"
+                                        name="edit_end_point" placeholder="Ending Point">
+                                    <label for="end_point">End Point</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="booking_limit"
+                                        name="edit_booking_limit" placeholder="Booking Limit">
+                                    <label for="booking_limit">Booking Limit ( Per User )</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="text-light p-0 m-0">
+                    <div class="d-flex align-content-end justify-content-end pt-2">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-custom">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- DISPLAY MODAL -->
+<div class="modal fade" id="busDetailsModal" tabindex="-1" role="dialog" aria-labelledby="busDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content bg-dark text-center">
+            <div class="modal-header text-light">
+                <h5 class="modal-title text-light" id="busDetailsModalLabel">BUS DETAIL</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <table
+                    class="table admin-table table-bordered table-striped-columns table-dark table-hover text-center">
+                    <tr>
+                        <th>Bus Name</th>
+                        <td id="display-busName"></td>
+                    </tr>
+                    <tr>
+                        <th>Bus Number</th>
+                        <td id="display-busNumber"></td>
+                    </tr>
+                    <tr>
+                        <th>Bus Type</th>
+                        <td id="display-busType"></td>
+                    </tr>
+                    <tr>
+                        <th>Journey Date</th>
+                        <td id="display-journeyDate"></td>
+                    </tr>
+                    <tr>
+                        <th>Start Point</th>
+                        <td id="display-startPoint"></td>
+                    </tr>
+                    <tr>
+                        <th>End Point</th>
+                        <td id="display-endPoint"></td>
+                    </tr>
+                    <tr>
+                        <th>Fare</th>
+                        <td id="display-fare"></td>
+                    </tr>
+                    <tr>
+                        <th>Booking Limit</th>
+                        <td id="display-bookingLimit"></td>
+                    </tr>
+                    <tr>
+                        <th>Max Seats</th>
+                        <td id="display-maxSeats"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+        $('.create-form').trigger('reset');
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $('.create-btn').on('click', function (e) {
+            $('#CreateModal').modal('show');
+        });
+        // Function to get max seats based on bus type
+        function getMaxSeats(busType) {
+            switch (busType) {
+                case "Coach Bus":
+                    return 50;
+                case "Mini Bus":
+                    return 20;
+                case "Tour Bus":
+                    return 30;
+                case "Shuttle Bus":
+                    return 15;
+                default:
+                    return 30;  // Default value
+            }
+        }
+        function getMaxPrice(busType) {
+            switch (busType) {
+                case "Coach Bus":
+                    return 750;
+                case "Mini Bus":
+                    return 500;
+                case "Tour Bus":
+                    return 1250;
+                case "Shuttle Bus":
+                    return 400;
+                default:
+                    return 400;  // Default value
+            }
+        }
+
+        // Update fare and max_seats on bus_type change
+        $("#busType").change(function () {
+            var selectedBusType = $(this).val();
+            var maxSeats = getMaxSeats(selectedBusType);
+            var maxPrice = getMaxPrice(selectedBusType);
+            var defaultLimit = 5;
+            // Set default fare and update max_seats
+            $("input[name='fare']").val(maxPrice);
+            $("input[name='max_seats']").val(maxSeats);
+            $("input[name='booking_limit']").val(defaultLimit);
+        });
+
+        // Function to show SweetAlert error
+        function showErrorAlert(message) {
+            Swal.fire({
+                title: "Error!",
+                text: message,
+                icon: "error",
+            });
+        }
+
+        // Function to validate form inputs
+        function validateForm() {
+            // Check if bus_name is empty
+            var busName = $("input[name='bus_name']").val();
+            if (busName.trim() === "") {
+                showErrorAlert("Bus Name cannot be empty.");
+                return false;
+            }
+
+            // Check if bus_number is empty or less than 0
+            var busNumber = $("input[name='bus_number']").val();
+            if (busNumber === "" || parseInt(busNumber) < 0) {
+                showErrorAlert("Invalid Bus Number.");
+                return false;
+            }
+
+            // Check if bus_type is selected
+            var busType = $("#busType").val();
+            if (busType === "") {
+                showErrorAlert("Please select a Bus Type.");
+                return false;
+            }
+
+            // Check if journey_date is empty
+            var journeyDate = $("input[name='journey_date']").val();
+            if (journeyDate === "") {
+                showErrorAlert("Journey Date cannot be empty.");
+                return false;
+            }
+
+            // Check if start_point and end_point are the same
+            var startPoint = $("input[name='start_point']").val();
+            var endPoint = $("input[name='end_point']").val();
+            if (startPoint === "") {
+                showErrorAlert("Start Point cannot be empty.");
+                return false;
+            }
+            if (endPoint === "") {
+                showErrorAlert("End Point cannot be empty.");
+                return false;
+            }
+            if (startPoint.trim() === endPoint.trim()) {
+                showErrorAlert("Starting Point and Ending Point cannot be the same.");
+                return false;
+            }
+
+            // Check if fare, booking_limit, and max_seats are less than 0
+            var fare = $("input[name='fare']").val();
+            var bookingLimit = $("input[name='booking_limit']").val();
+            var maxSeats = $("input[name='max_seats']").val();
+            if (parseInt(fare) < 0 || parseInt(bookingLimit) < 0 || parseInt(maxSeats) < 0) {
+                showErrorAlert("Fare, Booking Limit, and Max Seats cannot be less than 0.");
+                return false;
+            }
+
+            return true;  // Form is valid
+        }
+
+        // Submit form using AJAX
+        $("#Create-form").submit(function (e) {
+            e.preventDefault();
+
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+
+            // Serialize form data
+            var formData = $(this).serialize();
+
+            // Get CSRF token from the cookie
+            const csrftoken = getCookie('csrftoken');
+
+            // Make AJAX request
+            $.ajax({
+                type: "POST",
+                url: "{% url 'create-bus' %}",
+                data: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (response) {
+                    // Show success SweetAlert
+                    Swal.fire({
+                        title: "Success!",
+                        text: 'Bus Created Successfully',
+                        icon: "success",
+                    }).then(() => {
+                        location.reload();
+                    });
+                    $('#CreateModal').modal('hide');
+                    $('.create-form').trigger('reset');
+
+                },
+                error: function (xhr, status, error) {
+                    // Show error SweetAlert
+                    showErrorAlert("An error occurred. Please try again.");
+                },
+            });
+        });
+        // EDIT MODAL
+        $('.edit-btn').on('click', function (e) {
+            var editBtn = $(this);
+            var busId = editBtn.data('id');
+
+            editBtn.addClass('d-none');
+            editBtn.siblings('.edit-loader-btn').removeClass('d-none');
+            // Make AJAX request to get bus data
+            $.ajax({
+                type: "GET",
+                url: "{% url 'edit-bus' 0 %}".replace('0', busId),
+                success: function (response) {
+                    // Set values in the form
+                    $('#Edit-form [name=edit_bus_id]').val(response.bus.id);
+                    $('#Edit-form [name=edit_bus_name]').val(response.bus.bus_name);
+                    $('#Edit-form [name=edit_bus_number]').val(response.bus.bus_number);
+                    $('#Edit-form [name=edit_bus_type]').val(response.bus.bus_type);
+                    $('#Edit-form [name=edit_journey_date]').val(response.bus.journey_date);
+                    $('#Edit-form [name=edit_start_point]').val(response.bus.start_point);
+                    $('#Edit-form [name=edit_end_point]').val(response.bus.end_point);
+                    $('#Edit-form [name=edit_fare]').val(response.bus.fare);
+                    $('#Edit-form [name=edit_booking_limit]').val(response.bus.booking_limit);
+                    $('#Edit-form [name=edit_max_seats]').val(response.bus.max_seats);
+
+                    $('#EditModal').modal('show');
+                    editBtn.removeClass('d-none');
+                    editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    showErrorAlert("An error occurred. Please try again.");
+                    editBtn.removeClass('d-none');
+                    editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                }
+            });
+        });
+
+        $('#Edit-form').submit(function (e) {
+            e.preventDefault();
+
+            // Deserialize the serialized form data to an object
+            var formDataArray = $(this).serializeArray();
+            var formData = {};
+            for (var i = 0; i < formDataArray.length; i++) {
+                formData[formDataArray[i].name] = formDataArray[i].value;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+
+            // Add the bus_id to the formData
+            formData['bus_id'] = formData['edit_bus_id'];
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'update-bus' 0 %}".replace('0', formData['edit_bus_id']),
+                data: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (response) {
+                    if (response.status === "success") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: response.message,
+                            icon: "success",
+                        }).then(() => {
+                            location.reload();
+                        });
+                        $('#EditModal').modal('hide');
+                    } else {
+                        showErrorAlert("An error occurred. Please try again.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Show error SweetAlert
+                    showErrorAlert("An error occurred. Please try again.");
+                },
+            });
+        });
+
+
+        $('.delete-btn').on('click', function () {
+            var deleteBtn = $(this);
+            var busId = deleteBtn.data('id');
+            const csrftoken = getCookie('csrftoken');
+            // Show a confirmation SwalAlert
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                // If the user clicks 'Yes', proceed with the delete action
+                if (result.isConfirmed) {
+                    deleteBtn.addClass('d-none');
+                    deleteBtn.siblings('.delete-loader-btn').removeClass('d-none');
+                    // Make an AJAX request to delete the bus
+                    $.ajax({
+                        type: 'POST',
+                        url: "{% url 'delete-bus' %}",
+                        data: {
+                            'bus_id': busId,
+                            csrfmiddlewaretoken: csrftoken
+                        },
+                        success: function (response) {
+                            // Show success SwalAlert
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                // Reload the page after successful deletion
+                                location.reload();
+                            });
+                            deleteBtn.removeClass('d-none');
+                            deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                        },
+                        error: function (xhr, status, error) {
+                            // Show error SwalAlert
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred. Please try again.',
+                                icon: 'error'
+                            });
+                            deleteBtn.removeClass('d-none');
+                            deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                        }
+                    });
+                }
+            });
+        });
+
+        $('.display-btn').on('click', function () {
+            var displayBtn = $(this);
+            var busId = displayBtn.data('id');
+            displayBtn.addClass('d-none');
+            displayBtn.siblings('.display-loader-btn').removeClass('d-none');
+            $.ajax({
+                type: "GET",
+                url: "{% url 'bus-details' 0 %}".replace('0', busId),
+                success: function (response) {
+                    showBusDetails(response);
+                    displayBtn.removeClass('d-none');
+                    displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again.',
+                        icon: 'error'
+                    });
+                    displayBtn.removeClass('d-none');
+                    displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                }
+            });
+        });
+
+        function showBusDetails(busData) {
+            // Set values in the bus details modal
+            $('#display-busName').text(busData.bus_name);
+            $('#display-busNumber').text(busData.bus_number);
+            $('#display-busType').text(busData.bus_type);
+            $('#display-journeyDate').text(busData.journey_date);
+            $('#display-startPoint').text(busData.start_point);
+            $('#display-endPoint').text(busData.end_point);
+            $('#display-fare').text(busData.fare);
+            $('#display-bookingLimit').text(busData.booking_limit);
+            $('#display-maxSeats').text(busData.max_seats);
+            console.log(busData.bus_type);
+
+            // Show the bus details modal
+            $('#busDetailsModal').modal('show');
+        }
+
+
+        String.prototype.capitalize = function () {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        };
+    });
+</script>
+{% endblock bus-index %}

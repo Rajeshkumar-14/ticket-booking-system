@@ -1,0 +1,123 @@
+{% extends 'administration/base.html' %}
+{% block admin-profile %}
+<div class="container-fluid" style="min-height: 98vh;">
+    <div class="card border text-light bg-blur mt-3 p-3 pb-5" id="user-profile">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h4 class="text-center mb-3 mt-3">USER DETAILS</h4>
+        <hr>
+        <div class="card-body shadow">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">USER ID :</div>
+                        <div class="col-8">{{ request.user.id }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">USERNAME :</div>
+                        <div class="col-8">{{ request.user.username }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">EMAIL :</div>
+                        <div class="col-8">{{ request.user.email }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">GENDER :</div>
+                        <div class="col-8">
+                            {% if user_profile.gender %}
+                            {{ user_profile.gender }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">AGE :</div>
+                        <div class="col-8">
+                            {% if user_profile.age %}
+                            {{ user_profile.age }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">Date of Birth :</div>
+                        <div class="col-8">
+                            {% if user_profile.date_of_birth %}
+                            {{ user_profile.date_of_birth }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">Aadhaar Number :</div>
+                        <div class="col-8">
+                            {% if user_profile.aadhaar_number %}
+                            {{ user_profile.aadhaar_number }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">PHONE NUMBER :</div>
+                        <div class="col-8">
+                            {% if user_profile.phone_number %}
+                            {{ user_profile.phone_number }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <a href="{% url 'edit_admin_profile' %}" class="btn btn-custom w-100 mt-3">EDIT PROFILE</a>
+
+    </div>
+</div>
+<script>
+    function handleMessages() {
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: "{{ message|safe }}",
+        });
+        {% elif message.tags == 'error' %}
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "{{ message|safe }}",
+        });
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    }
+
+    // Call the function to handle messages when the document is ready
+    document.addEventListener("DOMContentLoaded", function () {
+        handleMessages();
+    });
+</script>
+{% endblock admin-profile %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+    });
+</script>
+{% endblock %}

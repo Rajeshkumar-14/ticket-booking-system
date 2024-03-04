@@ -1,0 +1,457 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Train Travel History{% endblock title %}
+
+{% block train-travel-history %}
+<div class="container-fluid train-container p-1 m-0">
+    <div class="card bg-blur border border-white text-white" style="height: 98vh; width: 100%; overflow-y: auto; ">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h5 class="text-center text-white mb-3 p-3 bg-blur border-bottom">TRAIN TRAVEL HISTORY</h5>
+        <div class="container mb-5 px-5" style="max-height: 750px; overflow-y: auto;">
+            {% if grouped_data %}
+            {% for key, group in grouped_data.items %}
+            <div class="card bg-blur border text-light text-center text-white mt-2 mb-4" style=" width: 100%;">
+                <h5 class="text-center mt-3">{{ key.0 }}</h5>
+                <h6 class="text-center">{{ key.1 }}</h6>
+                <hr>
+                <div class="card-body shadow" style="max-height: 500px; overflow: auto;">
+                    <table class="table table-bordered table-dark table-hover history-table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Passenger Name</th>
+                                <th>Seat Number</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation, train in group %}
+                            <tr>
+                                <td>{{ reservation.passenger_names }}</td>
+                                <td>{{ reservation.seat_numbers }}</td>
+                                <td>{{ reservation.status }}</td>
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Reservation Actions">
+                                        <button class="btn btn-success disabled me-1"><i
+                                                class="fa-solid fa-circle-check me-1"></i> Completed</button>
+                                        <button class="btn btn-sm btn-info display-ticket-btn me-1"
+                                            data-reservation-user="{{ reservation.id }}" data-toggle="modal"
+                                            data-target="#busReservationModal{{ reservation.id }}">
+                                            <i class="fa-solid fa-print me-1"></i> PRINT TICKET
+                                        </button>
+                                    </div>
+                                </td>
+                                <input type="hidden" name="reservation_user" id="reservation_user"
+                                    value="{{ reservation.reservation_user }}">
+                                <input type="hidden" name="trip_status" id="trip_status"
+                                    value="{{ reservation.status }}">
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- CARD FOOTER SECTION -->
+                    <div class="d-flex flex-row align-items-center">
+                        <div>
+                            <button class="btn btn-success completed-trip-btn disabled">
+                                <i class="fa-solid fa-circle-check me-1"></i>Completed
+                            </button>
+                        </div>
+                        <div class="ms-auto">
+                            <button class="btn btn-info display-all-ticket-btn" data-trip-name="{{ key.0 }}">
+                                <i class="fa-solid fa-download me-1"></i>DOWNLOAD TICKET
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="container-fluid p-5">
+                <div class="card text-light bg-dark shadow-lg text-center p-5">
+                    <h5>You haven't Traveled in any Train yet.</h5>
+                    <a href="{% url 'train-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% for key, group in grouped_data.items %}
+{% for reservation, train in group %}
+<!-- SINGLE USER RECIPT Display Modal -->
+<div class="modal fade" id="trainReservationModal{{ reservation.id }}" tabindex="1"
+    aria-labelledby="trainReservationModalLabel{{ reservation.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content bg-dark text-white">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="trainReservationModalLabel{{ reservation.id }}">Train Reservation Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-dark text-white " id="individualInvoice{{ reservation.id }}">
+                <div class="container mt-5 mb-5">
+                    <div class="d-flex justify-content-center row user-invoice bg-dark text-white">
+                        <div class="receipt rounded border rounded-2 p-3">
+                            <h4 class="mb-3 text-center">Train Reservation Details</h4>
+                            {% if reservation %}
+                            <h6 class="name">Hello {{ reservation.passenger_names }},</h6>
+                            <span class="fs-12 text-dark-50">Your train reservation has been confirmed.</span>
+                            <hr>
+                            <div class="d-flex flex-row justify-content-between align-items-center order-details">
+                                <div>
+                                    <span class="d-block fs-12">Reservation Date</span>
+                                    <span class="font-weight-bold">{{ reservation.created_at|date:"j F Y" }}</span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Reservation ID</span>
+                                    <span class="font-weight-bold">{{ reservation.id }}</span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Status</span>
+                                    <span class="font-weight-bold">{{ reservation.status }}</span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Journey Date</span>
+                                    <span class="font-weight-bold text-success">{{ key.2 }}</span>
+                                </div>
+                                <!-- Add more reservation details as needed -->
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center product-details">
+                                <table class="table-dark user-invoice-table table-hover table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th>TRAIN NAME</th>
+                                            <th>TRAIN TYPE</th>
+                                            <th>SEAT NO</th>
+                                            <th>PRICE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td>{{ key.0 }}</td>
+                                            <td>{{ key.1 }}</td>
+                                            <td>{{ reservation.seat_numbers }}</td>
+                                            <td>{{ key.3 }}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-active">
+                                            <th>Subtotal ₹</th>
+                                            <th scope="row" colspan="3"></th>
+                                            <td class="font-weight-bold">{{ key.3 }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center footer">
+                                <div class="thanks">
+                                    <span class="d-block font-weight-bold">Thanks for choosing our train service!</span>
+                                    <span>
+                                        <p class="text-success">LET's EXPLORE TEAM</p>
+                                    </span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-end align-items-end">
+                                    <span class="d-block font-weight-bold">Need Help?</span>
+                                    <span>
+                                        <a class="text-decoration-none text-info"
+                                            href="{% url 'support-home' %}">Contact Us
+                                            <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>No train reservation data available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex align-items-end justify-content-end footer-btn">
+                    <button class="btn btn-primary print-individual-ticket-btn me-2"
+                        data-reservation-user="{{ reservation.id }}" data-user-name="{{ reservation.passenger_names }}">
+                        <i class="fa-solid fa-print me-2"></i>PRINT TICKET
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
+{% endfor %}
+{% endfor %}
+<!-- MODAL TO DISPLAY ALL THE DETAILS -->
+<div class="modal fade" id="alldetailmodal" tabindex="1" aria-labelledby="alldetailmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content bg-dark text-white">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="alldetailmodalLabel">Train Trip Reservation Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-dark text-white" id="TripInvoice">
+                <div class="container border mt-2 mb-3">
+                    <div class="d-flex justify-content-center trip-invoice row bg-dark text-white">
+                        <div class="receipt rounded">
+                            <h4 class="mb-3 text-center">Train Trip Reservation Details</h4>
+                            <h6 class="name" id="trip_name">Trip Name : </h6>
+                            <span class="fs-12 text-dark-50">Your train reservation has been confirmed.</span>
+                            <hr>
+                            <div class="d-flex flex-row justify-content-between align-items-center order-details">
+                                <div>
+                                    <span class="d-block fs-12">Reservation Date</span>
+                                    <span class="font-weight-bold" id="reservationDate"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Reservation By</span>
+                                    <span class="font-weight-bold" id="reservationBy"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">TRAIN NAME</span>
+                                    <span class="font-weight-bold" id="trainName"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">TRAIN TYPE</span>
+                                    <span class="font-weight-bold text-success" id="trainType"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Status</span>
+                                    <span class="font-weight-bold" id="reservationStatus"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Journey Date</span>
+                                    <span class="font-weight-bold text-success" id="journeyDate"></span>
+                                </div>
+                                <div>
+                                    <span class="d-block fs-12">Run Daily</span>
+                                    <span class="font-weight-bold text-success" id="runDaily"></span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center product-details">
+                                <table
+                                    class="table-dark table-hover trip-invoice-table table table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th>PASSENGER NAME</th>
+                                            <th>SEAT NO</th>
+                                            <th>PRICE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider" id="reservationDetails">
+                                        <!-- Reservation details will be populated here dynamically -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-active">
+                                            <th>Subtotal ₹</th>
+                                            <th scope="row" colspan="2"></th>
+                                            <td class="font-weight-bold" id="subtotalAmount"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center footer">
+                                <div class="thanks">
+                                    <span class="d-block font-weight-bold">Thanks for choosing our train service!</span>
+                                    <span>
+                                        <p class="text-success">LET's EXPLORE TEAM</p>
+                                    </span>
+                                </div>
+                                <div class="d-flex flex-column justify-content-end align-items-end">
+                                    <span class="d-block font-weight-bold">Need Help?</span>
+                                    <span>
+                                        <a class="text-decoration-none text-info"
+                                            href="{% url 'support-home' %}">Contact Us
+                                            <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-dark text-white footer-btn">
+                <button class="btn btn-primary print-trip-ticket-btn me-2">
+                    <i class="fa-solid fa-print me-2"></i>PRINT TICKET
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script>
+    $(document).ready(function () {
+        // PRINT INDIVIDUAL INVOICE 
+        $(".print-individual-ticket-btn").click(function () {
+            var reservationId = $(this).data('reservation-user');
+            var userName = $(this).data('user-name');
+
+            // Generate the dynamic ID based on reservationId
+            var modalBodyId = '#individualInvoice' + reservationId;
+
+            if (localStorage.getItem('themePreference') === 'light') {
+                // If theme is light, hide the footer
+                $(modalBodyId + ' .footer-btn').addClass('d-none');
+            } else {
+                // If theme is not light, proceed with printing as usual
+                $(modalBodyId + ' .footer-btn').addClass('d-none');
+                $(modalBodyId + ' .user-invoice').removeClass('bg-dark text-white').addClass('bg-white text-dark');
+                $(modalBodyId + ' .user-invoice-table').removeClass('table-dark').addClass('table-light');
+            }
+
+            var printContent =
+                '<html>' +
+                '<head>' +
+                '<title>Print Ticket</title>' +
+                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">' +
+                '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">' +
+                '</head>' +
+                '<body>' +
+                $(modalBodyId).html() +
+                '</body>' +
+                '</html>';
+
+            html2pdf(printContent, {
+                margin: 10,
+                filename: userName + '-bus-booking-ticket.pdf',
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            });
+
+            if (localStorage.getItem('themePreference') !== 'light') {
+                // If theme is not light, show the footer after printing
+                $(modalBodyId + ' .user-invoice').removeClass('bg-white text-dark').addClass('bg-dark text-white');
+                $(modalBodyId + ' .user-invoice-table').removeClass('table-light').addClass('table-dark');
+            }
+            $(modalBodyId + ' .footer-btn').removeClass('d-none');
+        });
+
+
+        // PRINT TRIP INVOICE
+        $(".print-trip-ticket-btn").click(function () {
+            if (localStorage.getItem('themePreference') === 'light') {
+                // If theme is light, hide the footer
+                $('.footer-btn').addClass('d-none');
+            } else {
+                // If theme is not light, proceed with printing as usual
+                $('.footer-btn').addClass('d-none');
+                $('.trip-invoice').removeClass('bg-dark text-white').addClass('bg-white text-dark');
+                $('.trip-invoice-table').removeClass('table-dark').addClass('table-light');
+            }
+
+            var printContent =
+                '<html>' +
+                '<head>' +
+                '<title>Print Ticket</title>' +
+                '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">' +
+                '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">' +
+                '</head>' +
+                '<body>' +
+                document.getElementById('TripInvoice').innerHTML +
+                '</body>' +
+                '</html>';
+
+            html2pdf(printContent, {
+                margin: 10,
+                filename: 'bus-trip-ticket.pdf',
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'letter', orientation: 'landscape' }
+            });
+
+            if (localStorage.getItem('themePreference') !== 'light') {
+                // If theme is not light, show the footer after printing
+                $('.trip-invoice').removeClass('bg-white text-dark').addClass('bg-dark text-white');
+                $('.trip-invoice-table').removeClass('table-light').addClass('table-dark');
+            }
+            $('.footer-btn').removeClass('d-none');
+        });
+    })
+</script>
+{% endblock train-travel-history %}
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+
+        // Display Individual ticket
+        $('.display-ticket-btn').on('click', function () {
+            var reservationId = $(this).data('reservation-user');
+
+            $('#trainReservationModal' + reservationId).modal('show');
+        });
+
+        // Display All ticket
+        $(".display-all-ticket-btn").click(function () {
+            var tripName = $(this).data('trip-name');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'train-reservation-history-details' %}",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'trip_name': tripName,
+                },
+                success: function (response) {
+                    $('#trip_name').text('Trip Name : ' + response.train_data.train_name);
+
+                    var reservationDetailsHtml = '';
+                    var totalFare = 0;
+                    $.each(response.reservation_data, function (index, reservation) {
+                        reservationDetailsHtml += '<tr>' +
+                            '<th scope="row">' + (index + 1) + '</th>' +
+                            '<td>' + reservation.passenger_names + '</td>' +
+                            '<td>' + reservation.seat_numbers + '</td>' +
+                            '<td>' + response.train_data.fare + '</td>' +
+                            '</tr>';
+
+                        totalFare += parseFloat(response.train_data.fare);
+                    });
+                    $('#reservationDetails').html(reservationDetailsHtml);
+
+                    $('#reservationDate').text(response.reservation_data[0].created_at);
+                    $('#reservationBy').text(response.reservation_data[0].reservation_user);
+                    $('#reservationStatus').text(response.reservation_data[0].status);
+                    $('#journeyDate').text(response.train_data.departure_date);
+                    $('#trainName').text(response.train_data.departure_station + ' to ' + response.train_data.arrival_station);
+                    $('#trainType').text(response.train_data.train_type);
+
+                    var runDailyElement = $('#runDaily');
+                    runDailyElement.empty();
+
+                    if (response.train_data.run_daily) {
+                        runDailyElement.append('<i class="fa-solid fa-circle-check" style="color: #44ff00; padding-left:15px;"></i>');
+                    } else {
+                        runDailyElement.append('<i class="fa-solid fa-circle-xmark" style="color: #ff0000;padding-left:15px;"></i>');
+                    }
+
+                    $('#subtotalAmount').text(totalFare.toFixed(2));
+
+                    $('#alldetailmodal').modal('show');
+                },
+                error: function (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error While retrieving Data, Try again Later.',
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock script %}

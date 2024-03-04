@@ -1,0 +1,185 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Bus Booking History{% endblock title %}
+
+{% block bus-history %}
+<div class="container-fluid bus-container p-1 m-0">
+    <div class="card bg-blur text-light border" style="height: 98vh; width: 100%;  overflow-y: auto; ">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom">BUS BOOKINGS</h5>
+        <div class="container mb-5 px-5" style="max-height: 750px; overflow-y: auto;">
+            {% if grouped_data %}
+            {% for key, group in grouped_data.items %}
+            <div class="card text-light bg-blur border text-center mt-2 mb-4" style="width: 100%; ">
+                <h5 class="text-center mt-3">{{ key.0 }}</h5>
+                <h6 class="text-center">{{ key.1 }}</h6>
+                <hr class="bg-white">
+                <div class="card-body shadow" style="max-height: 500px; overflow: auto;">
+                    <table class="table admin-table table-bordered table-dark table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Passenger Name</th>
+                                <th>Seat Number</th>
+                                <th>Status</th>
+                                <th>Reserved By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation, bus in group %}
+                            <tr>
+                                <td>{{ reservation.passenger_names }}</td>
+                                <td>{{ reservation.seat_numbers }}</td>
+                                <td>{{ reservation.status }}</td>
+                                <td>{{ reservation.reservation_user }}</td>
+                                <td>
+                                    {% if reservation.status != 'Completed' %}
+                                    <button class="btn btn-danger cancel-btn me-1"
+                                        data-reservation-id="{{ reservation.id }}"><i class="fa-solid fa-ban me-1"></i>
+                                        Cancel</button>
+                                    <button class="btn btn-danger cancel-loading-btn me-1 disabled d-none rounded-2">
+                                        <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                                        <span role="status">Cancelling</span>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-success disabled cancel-btn"
+                                        data-reservation-id="{{ reservation.id }}">Completed</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <input type="hidden" name="reservation_user" id="reservation_user"
+                                value="{{ reservation.reservation_user }}">
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- Trip Cancel -->
+                    <button class="btn btn-danger cancel-trip-btn" data-trip-name="{{ key.0 }}"
+                        data-trip-bus-id="{{ key.2 }}">
+                        <i class="fa-solid fa-ban me-1"></i>Cancel Trip
+                    </button>
+                    <button class="btn btn-danger cancel-loading-btn me-1 disabled d-none rounded-2">
+                        <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                        <span role="status">Cancelling Trip</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="container-fluid p-5">
+                <div class="card bg-dark text-light shadow-lg text-center p-5">
+                    <h5>No Bus Havn't Booked Yet.</h5>
+                    <a href="{% url 'administration-home' %}" class="btn btn-custom mt-3 btn-lg">Back to DashBoard</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock bus-history %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+
+        $(".cancel-btn").click(function () {
+            var cancelBtn = $(this);
+            var reservationId = cancelBtn.data("reservation-id");
+
+            // Show a confirmation SweetAlert before sending the AJAX request
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to cancel this reservation.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, cancel it!",
+                cancelButtonText: "No, keep it",
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    cancelBtn.addClass("d-none");
+                    cancelBtn.siblings('.cancel-loading-btn').removeClass("d-none");
+                    // User confirmed the action, send the AJAX request
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'cancel-bus-reservation' %}",
+                        data: {
+                            reservation_id: reservationId,
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire("Cancelled!", "The Booking has been cancelled.", "success").then(function () {
+                                    // Reload the current page
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire("Error", "An error occurred while cancelling the Booking.", "error");
+                                cancelBtn.removeClass("d-none");
+                                cancelBtn.siblings('.cancel-loading-btn').addClass("d-none");
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "An error occurred while sending the request.", "error");
+                            cancelBtn.removeClass("d-none");
+                            cancelBtn.siblings('.cancel-loading-btn').addClass("d-none");
+                        },
+                    });
+                }
+            });
+        });
+
+        $(".cancel-trip-btn").click(function () {
+            var cancelTripBtn = $(this);
+            var tripName = cancelTripBtn.data("trip-name");
+            var tripBusId = cancelTripBtn.data('trip-bus-id');
+            var reservation_user = $('#reservation_user').val();
+
+            console.log(tripBusId);
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to cancel the entire trip: " + tripName,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, cancel it!",
+                cancelButtonText: "No, keep it",
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    cancelTripBtn.addClass("d-none");
+                    cancelTripBtn.siblings('.cancel-loading-btn').removeClass("d-none");
+                    // User confirmed the action, send the AJAX request
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'cancel-bus-trip' %}",
+                        data: {
+                            trip_name: tripName,
+                            bus_id: tripBusId,
+                            reservation_user: reservation_user,
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                Swal.fire("Cancelled!", "The entire trip has been cancelled.", "success").then(function () {
+                                    // Reload the current page
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire("Error", "An error occurred while cancelling the trip.", "error");
+                                cancelTripBtn.removeClass("d-none");
+                                cancelTripBtn.siblings('.cancel-loading-btn').addClass("d-none");
+
+                            }
+                        },
+                        error: function () {
+                            Swal.fire("Error", "An error occurred while cancelling the trip.", "error");
+                            cancelTripBtn.removeClass("d-none");
+                            cancelTripBtn.siblings('.cancel-loading-btn').addClass("d-none");
+                        },
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock script %}

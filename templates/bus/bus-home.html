@@ -1,0 +1,216 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}BUS{% endblock title %}
+
+
+{% block bus-home %}
+<div class="container-fluid bus-container p-1 m-0">
+    <div class="card bg-blur border text-light" style="height: 98vh; overflow-y: auto; ">
+        <div class="container-fluid text-center home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+            <p>Your Trusted Travel Partner for Memorable Adventures</p>
+        </div>
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom ">BUS BOOKING</h5>
+        <div class="container">
+            <div class="card bg-blur mt-2 border">
+                <h4 class="text-center mt-3 mb-3 text-light">Choose Starting & Ending Points</h4>
+                <hr class="text-light">
+                <div class="card-body shadow">
+                    <form method="POST" class="needs-validation reserveForm" id="reserveForm" novalidate>
+                        {% csrf_token %}
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="startPoint" name="start_point">
+                                    <option value="" selected disabled>Select Starting Point</option>
+                                    {% for point in starting_points %}
+                                    <option value="{{ point }}">{{ point }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="startPoint">Starting Point</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="endPoint" name="end_point">
+                                    <option value="" selected disabled>Select Ending Point</option>
+                                    {% for point in ending_points %}
+                                    <option value="{{ point }}">{{ point }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="endPoint">Ending Point</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="busType" name="bus_type">
+                                    <option value="" selected disabled>Select Bus Type</option>
+                                    {% for bus_type in bus_types %}
+                                    <option value="{{ bus_type.0 }}">{{ bus_type.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="busType">Bus Type</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="date" placeholder="DD/MM/YYYY">
+                                    <label for="date">Travel Date</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn mt-1 btn-custom align-content-center">Find Bus</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="busModal" tabindex="-1" role="dialog" aria-labelledby="busModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content bg-dark text-center">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="busModalLabel">Available Buses</h5>
+                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add a table here to display bus details -->
+                <table
+                    class="table table-bordered available-detail-table table-striped-column table-dark table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>Bus Type</th>
+                            <th>Date</th>
+                            <th>Start Point</th>
+                            <th>End Point</th>
+                            <th>Fare</th>
+                            <th>Max Seats</th>
+                            <th>Reserve</th>
+                        </tr>
+                    </thead>
+                    <tbody id="busTableBody">
+                        <!-- Bus details will be filled dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock bus-home %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+
+        $('.reserveForm').submit(function (e) {
+            e.preventDefault();
+
+            const start_point = $('#startPoint').val();
+            const end_point = $('#endPoint').val();
+            const bus_type = $('#busType').val();
+            const date = $('#date').val();
+
+            // Check if options are selected
+            if (start_point === "" || end_point === "" || bus_type === "" || date === "") {
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Please fill all the fields',
+                    icon: 'warning',
+                });
+                return;
+            }
+            if (start_point === end_point || end_point === start_point) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Starting Point & Ending Point Cannot be Same',
+                    icon: 'Error',
+                });
+                return;
+            }
+
+            // Get the CSRF token from the cookies
+            const csrftoken = getCookie('csrftoken');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'check-bus-availability' %}",
+                data: {
+                    'start_point': start_point,
+                    'end_point': end_point,
+                    'bus_type': bus_type,
+                    'date': date,
+                    csrfmiddlewaretoken: csrftoken,
+                },
+                success: function (data) {
+                    if (data.available) {
+                        // Populate the bus details in the modal table
+                        const busDetails = data.bus_details;
+                        if (busDetails) {
+                            const tableRow = `
+                        <tr>
+                            <td>${busDetails.bus_type}</td>
+                            <td>${busDetails.journey_date}</td>
+                            <td>${busDetails.start_point}</td>
+                            <td>${busDetails.end_point}</td>
+                            <td>${busDetails.fare}</td>
+                            <td>${busDetails.max_seats}</td>
+                            <td>
+                                <button class="btn btn-custom reserve-button" data-bus-id="${busDetails.bus_id}">Reserve</button>
+                            </td>
+                        </tr>`;
+                            $('#busTableBody').html(tableRow);
+
+                            // Show the modal
+                            $('#busModal').modal('show');
+
+                            // Attach a click event for the reservation button
+                            $('.reserve-button').click(function () {
+                                const busId = $(this).data('bus-id');
+                                // Redirect to 'bus-reservation' with the selected bus ID
+                                window.location.href = "{% url 'bus-reservation' 0 %}".replace('0', busId);
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Sorry',
+                            text: 'No buses are available for your current selection',
+                            icon: 'error',
+                        });
+                    }
+                },
+                error: function () {
+                    // Handle the error case here
+                    Swal.fire({
+                        title: 'Sorry',
+                        text: 'An error occurred, please try again.',
+                        icon: 'error',
+                    });
+                }
+            });
+        });
+
+        // Function to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock script %}

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="icon" href="{% static 'core/images/lets-explore-logo.png' %}">
+
+  <!-- Bootstrap Icons CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.20.0/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- Icon CDN -->
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css'>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!-- Style -->
+  <link rel="stylesheet" href="{% static 'core/css/core-style.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/card-style.css' %}">
+
+  <!-- BUS Style -->
+  <link rel="stylesheet" href="{% static 'bus/css/bus-style.css' %}">
+
+  <!-- Train Style -->
+  <link rel="stylesheet" href="{% static 'train/css/train-style.css' %}">
+
+  <!-- Flight Style -->
+  <link rel="stylesheet" href="{% static 'flight/css/flight-style.css' %}">
+
+  <!-- Invoice Style -->
+  <link rel="stylesheet" href="{% static 'invoice/invoice-style.css' %}">
+
+  <!-- DataTable -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+  <!-- Custom Bootstrap File -->
+  <link rel="stylesheet" href="{% static 'custom-tools/tbs-custom-tools.css' %}">
+
+  <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+  {% block content %}
+  <div class="container-fluid">
+    <div class="row">
+     
+      {% block side-bar %}
+      <div class="col-2 p-0">
+        <div class="bg-dark side-bar text-white p-1" style="height: 100vh; overflow-y: auto;">
+          <!-- Toggle button for the sidebar -->
+          <button class="btn btn-light d-lg-none" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse">
+            <i class="fa-solid fa-bars-staggered fa-lg"></i>
+          </button>
+
+          <!-- Sidebar content within a collapse div -->
+          <div class="collapse show" id="sidebarCollapse">
+            <a href="{% url 'index' %}" class="text-white pe-3 mb-1 link-light text-decoration-none d-block">
+              <img src="{% static 'core/images/lets-explore-logo.png' %}" class="img-fluid img" width="45">
+              <span class="fs-5 fw-semibold">LET's EXPLORE</span>
+            </a>
+            <p class="border-bottom mb-2 p-0 m-0"></p>
+            <ul class="list-unstyled">
+              <li class="active">
+                <a href="{% url 'index' %}" class="btn text-white">
+                  <i class="fa-solid fa-home me-3"></i>
+                  <span class="menu-text">Home</span>
+                </a>
+              </li>
+              <li>
+                <a href="#ticket-collapse" class="btn-toggle btn text-white align-items-center collapsed"
+                  data-bs-toggle="collapse" aria-expanded="false">
+                  <i class="fa-solid fa-route me-3"></i>
+                  <span class="menu-text">Tickets</span>
+                </a>
+                <div class="collapse" id="ticket-collapse">
+                  <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
+                    <li>
+                      <a href="{% url 'bus-home' %}" class="btn text-white"><i class="fas fa-bus me-2"></i><span
+                          class="menu-text">Bus</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'flight-home' %}" class="btn text-white"><i class="fas fa-plane me-2"></i><span
+                          class="menu-text">Flight</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'train-home' %}" class="btn text-white"><i class="fas fa-train me-2"></i><span
+                          class="menu-text">Train</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <a href="#ticket-booking-collapse" class="btn-toggle btn text-white align-items-center collapsed"
+                  data-bs-toggle="collapse" aria-expanded="false">
+                  <i class="fa-solid fa-ticket me-3"></i>
+                  <span class="menu-text">My Tickets</span>
+                </a>
+                <div class="collapse" id="ticket-booking-collapse">
+                  <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
+                    <li>
+                      <a href="{% url 'bus-booking-history' %}" class="btn text-white"><i
+                          class="fas fa-bus me-2"></i><span class="menu-text">Bus</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'flight-booking-history' %}" class="btn text-white"><i
+                          class="fas fa-plane me-2"></i><span class="menu-text">Flight</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'train-booking-history' %}" class="btn text-white"><i
+                          class="fas fa-train me-2"></i><span class="menu-text">Train</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <a href="{% url 'support-home' %}" class="btn text-white">
+                  <i class="fa-solid fa-headset me-3"></i>
+                  <span class="menu-text">Support</span>
+                </a>
+              </li>
+              <li>
+                <a href="#travel-history" class="btn-toggle btn text-white align-items-center collapsed"
+                  data-bs-toggle="collapse" aria-expanded="false">
+                  <i class="fa-solid fa-clock-rotate-left me-3"></i>
+                  <span class="menu-text">Travel History</span>
+                </a>
+                <div class="collapse" id="travel-history">
+                  <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
+                    <li>
+                      <a href="{% url 'bus-travel-history' %}" class="btn text-white"><i
+                          class="fas fa-bus me-2"></i><span class="menu-text">Bus</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'flight-travel-history' %}" class="btn text-white"><i
+                          class="fas fa-plane me-2"></i><span class="menu-text">Flight</span></a>
+                    </li>
+                    <li>
+                      <a href="{% url 'train-travel-history' %}" class="btn text-white"><i
+                          class="fas fa-train me-2"></i><span class="menu-text">Train</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <a href="#profile-collapse" class="btn text-white btn-toggle align-items-center collapsed"
+                  data-bs-toggle="collapse" aria-expanded="false">
+                  <i class="fa-solid fa-user me-3"></i>
+                  <span class="menu-text text-capitalize">{{ request.user }}</span>
+                </a>
+                <div class="collapse" id="profile-collapse">
+                  <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
+                    <li>
+                      <a href="{% url 'user_profile' %}" class="btn text-white"><i
+                          class="fa-solid fa-gear me-2"></i><span class="menu-text">Profile</span></a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>
+                      <a href="{% url 'logout' %}" class="btn text-white"><i
+                          class="fa-solid fa-arrow-right-from-bracket me-2"></i><span
+                          class="menu-text">Log-Out</span></a>
+                    </li>
+                    {% else %}
+                    <li>
+                      <a href="{% url 'login' %}" class="btn text-white"><i
+                          class="fa-solid fa-arrow-right-to-bracket me-2"></i><span class="menu-text">Log-In</span></a>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </li>
+
+              <div class="col-2 fixed-bottom justify-content-start github-link mb-2">
+                <a href="https://github.com/Rajeshkumar-14" target="_blank" class="text-decoration-none text-light">
+                  <i class="fa-brands fa-github fa-lg me-2"></i>RajeshKumar</a>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {% endblock side-bar %}
+
+      {% block right-side %}
+
+      <div class="col-10 right-side">
+
+        <!-- Index -->
+
+        {% block index %}
+
+        {% endblock index %}
+
+        <!-- Bus Home -->
+        {% block bus-home %}
+
+        {% endblock bus-home %}
+
+        <!-- Bus Selection -->
+        {% block bus-selection %}
+
+        {% endblock bus-selection %}
+
+        <!-- Bus Reservation -->
+        {% block bus-reservation %}
+
+        {% endblock bus-reservation %}
+
+        <!-- Bus Booking History -->
+        {% block bus-booking-history %}
+
+        {% endblock bus-booking-history %}
+
+        <!-- Bus Travel History -->
+        {% block bus-travel-history %}
+
+        {% endblock bus-travel-history %}
+
+        <!-- Train Home -->
+        {% block train-home %}
+
+        {% endblock train-home %}
+
+        <!-- Train Reservation -->
+        {% block train-reservation %}
+
+        {% endblock train-reservation %}
+
+        <!-- Train Booking History -->
+        {% block train-booking-history %}
+
+        {% endblock train-booking-history %}
+
+        <!-- Train Travel Booking -->
+        {% block train-travel-history %}
+
+        {% endblock train-travel-history %}
+
+        <!-- Flight Home -->
+        {% block flight-home %}
+
+        {% endblock flight-home %}
+
+        <!-- Flight Reservation -->
+        {% block flight-reservation %}
+
+        {% endblock flight-reservation %}
+
+        <!-- Flight Booking History -->
+        {% block flight-booking-history %}
+
+        {% endblock flight-booking-history %}
+
+        <!-- Flight Travel History -->
+        {% block flight-travel-history %}
+
+        {% endblock flight-travel-history %}
+
+        <!-- Support Home -->
+        {% block support-home %}
+
+        {% endblock support-home %}
+
+        <!-- User Profile Detail -->
+        {% block user-profile %}
+
+        {% endblock user-profile %}
+
+        <!-- User Profile Details -->
+        {% block edit-user-profile %}
+
+        {% endblock edit-user-profile %}
+
+        <!-- Single Train Invoice -->
+        {% block single-user-invoice-train %}
+
+        {% endblock single-user-invoice-train %}
+      </div>
+      {% endblock right-side %}
+    </div>
+  </div>
+  {% endblock content %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- BootStrap Script -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Popper.js (required for dropdowns) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+
+  <!-- Include SweetAlert CDN Link -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Custom CSS -->
+  <script src="{% static 'core/js/core-script.js' %}"></script>
+
+  <!-- Datatable -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <!-- Scripts from other pages -->
+  {% block script %}
+
+  {% endblock %}
+
+
+  
+
+</body>
+
+</html>

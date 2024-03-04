@@ -1,0 +1,747 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Train Index{% endblock title %}
+
+{% block train-index %}
+<div class="container-fluid train-container p-1 m-0">
+    <div class="card bg-blur border text-light pb-3" style="height: 98vh; overflow-y: auto;">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <div class="container-fluid text-center  home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+        </div>
+        <div class=" p-3 bg-blur border-bottom ">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 mt-2">
+                        <h5 class="text-center ">TRAIN MANAGEMENT</h5>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <button type="button" class="btn btn-custom create-btn btn-sm">
+                            CREATE TRAIN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-blur border text-light  mt-2 mx-2" style="height: 600px; overflow-y: auto; ">
+            <div class="card-header text-center border-bottom">
+                <h5 class="card-title">TRAIN MANAGEMENT</h5>
+            </div>
+            <div class="card-body">
+                {% if trains %}
+                <table
+                    class="table text-center table-bordered rounded-2 table-dark admin-table table-hover table-striped"
+                    style="max-height: 250px; overflow: auto;">
+                    <thead>
+                        <tr>
+                            <th>Train Number</th>
+                            <th>Train Name</th>
+                            <th>Train Type</th>
+                            <th>Departure Station</th>
+                            <th>Arrival Station</th>
+                            <th>Departure Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for train in trains %}
+                        <tr>
+                            <td>{{ train.train_number }}</td>
+                            <td>{{ train.train_name }}</td>
+                            <td>{{ train.train_type }}</td>
+                            <td>{{ train.departure_station }}</td>
+                            <td>{{ train.arrival_station }}</td>
+                            <td>{{ train.departure_date }}</td>
+                            <td>
+                                <button class="btn btn-info display-btn me-1" data-id="{{ train.id }}"><i
+                                        class="fa-solid fa-eye"></i></button>
+                                <button class="btn btn-info display-loader-btn d-none me-1 rounded-start-2"
+                                    type="button" disabled>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                    <span class="visually-hidden" role="status">Loading...</span>
+                                </button>
+                                <!--  -->
+                                <button class="btn btn-warning edit-btn me-1" data-id="{{ train.id }}"><i
+                                        class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn btn-warning edit-loader-btn d-none me-1" type="button" disabled>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                    <span class="visually-hidden" role="status">Loading...</span>
+                                </button>
+                                <!--  -->
+                                <button class="btn btn-danger delete-loader-btn d-none rounded-end-2" type="button"
+                                    disabled>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                    <span class="visually-hidden" role="status">Loading...</span>
+                                </button>
+                                <button class="btn btn-danger delete-btn" data-id="{{ train.id }}"><i
+                                        class="fa-regular fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="container-fluid p-5">
+                    <div class="card bg-dark text-light shadow-lg text-center p-5">
+                        <h5>Please create a train.</h5>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Modal -->
+    <div class="modal fade" id="CreateModal" tabindex="-1" role="dialog" aria-labelledby="CreateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content bg-dark  ">
+                <div class="modal-header text-light">
+                    <h5 class="modal-title">CREATE TRAIN</h5>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'create-train' %}" method="POST" id="Create-form" class="create-form">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" name="train_name"
+                                            placeholder="Train Name">
+                                        <label for="train_name">Train Name</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3 form-check border-1 border bg-light py-3 px-3 rounded-2">
+                                    <div class="px-3 m-0">
+                                        <input type="checkbox" class="form-check-input border-dark" name="run_daily"
+                                            id="RunDaily">
+                                        <label class="form-check-label text-dark" for="RunDaily">Check if Runs
+                                            Daily</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="date" class="form-control" id="departure_date"
+                                            name="departure_date" placeholder="Departure Date">
+                                        <label for="departure_date">Departure Date</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" id="departure_station"
+                                            name="departure_station" placeholder="Departure Station">
+                                        <label for="departure_station">Departure Station</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="max_seats"
+                                            name="max_seats" placeholder="Max Seats">
+                                        <label for="max_seats">Max Seats</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="train_number"
+                                            name="train_number" placeholder="Train Number">
+                                        <label for="train_number">Train Number</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select trainType" id="trainType" name="train_type" required>
+                                            <option value="" selected disabled>Select Train Type</option>
+                                            {% for train_type in train_types %}
+                                            <option value="{{ train_type.0 }}">{{ train_type.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label for="floatingSelect">Train Type</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="fare" name="fare"
+                                            placeholder="Fare">
+                                        <label for="fare">Fare</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" id="arrival_station"
+                                            name="arrival_station" placeholder="Arrival Station">
+                                        <label for="arrival_station">Arrival Station</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="booking_limit"
+                                            name="booking_limit" placeholder="Booking Limit">
+                                        <label for="booking_limit">Booking Limit ( Per User )</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="text-light p-0 m-0">
+                        <div class="pt-3 d-flex align-content-end justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-custom">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content bg-dark">
+                <div class="modal-header text-light">
+                    <h5 class="modal-title text-light">UPDATE TRAIN</h5>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="Edit-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="hidden" class="form-control" name="edit_train_id" placeholder="Train Id">
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" name="edit_train_name"
+                                            placeholder="Train Name">
+                                        <label for="train_name">Train Name</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3 form-check border-1 border bg-light py-3 px-3 rounded-2">
+                                    <div class="px-3 m-0">
+                                        <input type="checkbox" class="form-check-input border-dark"
+                                            name="edit_run_daily" id="editRunDaily">
+                                        <label class="form-check-label text-dark" for="editRunDaily">Check if Runs
+                                            Daily</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="date" class="form-control" id="departure_date"
+                                            name="edit_departure_date" placeholder="Departure Date">
+                                        <label for="departure_date">Departure Date</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" id="departure_station"
+                                            name="edit_departure_station" placeholder="Departure Station">
+                                        <label for="departure_station">Departure Station</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="max_seats"
+                                            name="edit_max_seats" placeholder="Max Seats">
+                                        <label for="max_seats">Max Seats</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="train_number"
+                                            name="edit_train_number" placeholder="Train Number">
+                                        <label for="train_number">Train Number</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select trainType" id="trainType" name="edit_train_type"
+                                            required>
+                                            <option value="" selected disabled>Select Train Type</option>
+                                            {% for train_type in train_types %}
+                                            <option value="{{ train_type.0 }}">{{ train_type.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label for="floatingSelect">Train Type</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="fare" name="edit_fare"
+                                            placeholder="Fare">
+                                        <label for="fare">Fare</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="text" class="form-control" id="arrival_station"
+                                            name="edit_arrival_station" placeholder="Arrival Station">
+                                        <label for="arrival_station">Arrival Station</label>
+                                    </div>
+                                </div>
+                                <!--  -->
+                                <div class="mb-3">
+                                    <div class="form-floating mb-3">
+                                        <input required type="number" class="form-control" id="booking_limit"
+                                            name="edit_booking_limit" placeholder="Booking Limit">
+                                        <label for="booking_limit">Booking Limit ( Per User )</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="text-light p-0 m-0">
+                        <div class="d-flex align-content-end justify-content-end pt-2">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-custom">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DISPLAY MODAL -->
+    <div class="modal fade" id="trainDetailsModal" tabindex="-1" role="dialog" aria-labelledby="trainDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content bg-dark  text-center">
+                <div class="modal-header text-light">
+                    <h5 class="modal-title text-light" id="trainDetailsModalLabel">Train Details</h5>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table
+                        class="table table-bordered table-striped-column table-dark admin-table table-hover text-center">
+                        <tr>
+                            <th>Train Name</th>
+                            <td id="display-trainName"></td>
+                        </tr>
+                        <tr>
+                            <th>Train Number</th>
+                            <td id="display-trainNumber"></td>
+                        </tr>
+                        <tr>
+                            <th>Train Type</th>
+                            <td id="display-trainType"></td>
+                        </tr>
+                        <tr>
+                            <th>Run Daily</th>
+                            <td id="display-runDaily"></td>
+                        </tr>
+                        <tr>
+                            <th>Departure Date</th>
+                            <td id="display-departureDate"></td>
+                        </tr>
+                        <tr>
+                            <th>Departure Station</th>
+                            <td id="display-departureStation"></td>
+                        </tr>
+                        <tr>
+                            <th>Arrival Station</th>
+                            <td id="display-arrivalStation"></td>
+                        </tr>
+                        <tr>
+                            <th>Fare</th>
+                            <td id="display-fare"></td>
+                        </tr>
+                        <tr>
+                            <th>Booking Limit</th>
+                            <td id="display-bookingLimit"></td>
+                        </tr>
+                        <tr>
+                            <th>Max Seats</th>
+                            <td id="display-maxSeats"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.page-loader').addClass('d-none');
+            $('.create-form').trigger('reset');
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === name + '=') {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            $('.create-btn').on('click', function (e) {
+                $('#CreateModal').modal('show');
+            });
+
+            // Function to get max seats based on train type
+            function getMaxSeats(trainType) {
+                switch (trainType) {
+                    case "High-Speed Train":
+                        return 50;
+                    case "Express Train":
+                        return 30;
+                    case "Local Train":
+                        return 20;
+                    default:
+                        return 30;  // Default value
+                }
+            }
+            function getMaxPrice(trainType) {
+                switch (trainType) {
+                    case "High-Speed Train":
+                        return 100;
+                    case "Express Train":
+                        return 50;
+                    case "Local Train":
+                        return 25;
+                    default:
+                        return 25;  // Default value
+                }
+            }
+
+            // Update fare and max seats on train_type change
+            $(".trainType").change(function () {
+                var selectedTrainType = $(this).val();
+                var maxSeats = getMaxSeats(selectedTrainType);
+                var maxPrice = getMaxPrice(selectedTrainType);
+                var defaultLimit = 5;
+                // Set default fare, max_seats, and booking_limit
+                $(this).closest("form").find("input[name='fare']").val(maxPrice);
+                $(this).closest("form").find("input[name='max_seats']").val(maxSeats);
+                $(this).closest("form").find("input[name='booking_limit']").val(defaultLimit);
+            });
+
+            // Function to show SweetAlert error
+            function showErrorAlert(message) {
+                Swal.fire({
+                    title: "Error!",
+                    text: message,
+                    icon: "error",
+                });
+            }
+
+            // Function to validate form inputs
+            function validateForm() {
+                // Check if train_name is empty
+                var trainName = $("input[name='train_name']").val();
+                if (trainName.trim() === "") {
+                    showErrorAlert("Train Name cannot be empty.");
+                    return false;
+                }
+
+                // Check if train_number is empty or less than 0
+                var trainNumber = $("input[name='train_number']").val();
+                if (trainNumber === "" || parseInt(trainNumber) < 0) {
+                    showErrorAlert("Invalid Train Number.");
+                    return false;
+                }
+
+                // Check if train_type is selected
+                var trainType = $("#trainType").val();
+                if (trainType === "") {
+                    showErrorAlert("Please select a Train Type.");
+                    return false;
+                }
+
+                // Check if departure_date is empty
+                var departureDate = $("input[name='departure_date']").val();
+                if (departureDate === "") {
+                    showErrorAlert("Departure Date cannot be empty.");
+                    return false;
+                }
+
+                // Check if departure_station and arrival_station are the same
+                var departureStation = $("input[name='departure_station']").val();
+                var arrivalStation = $("input[name='arrival_station']").val();
+                if (departureStation === "") {
+                    showErrorAlert("Departure Station cannot be empty.");
+                    return false;
+                }
+                if (arrivalStation === "") {
+                    showErrorAlert("Arrival Station cannot be empty.");
+                    return false;
+                }
+                if (departureStation.trim() === arrivalStation.trim()) {
+                    showErrorAlert("Departure Station and Arrival Station cannot be the same.");
+                    return false;
+                }
+
+                // Check if fare, booking_limit, and max_seats are less than 0
+                var fare = $("input[name='fare']").val();
+                var bookingLimit = $("input[name='booking_limit']").val();
+                var maxSeats = $("input[name='max_seats']").val();
+                if (parseInt(fare) < 0 || parseInt(bookingLimit) < 0 || parseInt(maxSeats) < 0) {
+                    showErrorAlert("Fare, Booking Limit, and Max Seats cannot be less than 0.");
+                    return false;
+                }
+
+                return true;  // Form is valid
+            }
+
+            // Submit form using AJAX
+            $("#Create-form").submit(function (e) {
+                e.preventDefault();
+
+                // Validate form
+                if (!validateForm()) {
+                    return;
+                }
+
+                // Manually handle the run_daily checkbox
+                var runDailyValue = $('#RunDaily').is(':checked') ? 'on' : 'off';
+                var formData = $(this).serialize() + '&run_daily=' + runDailyValue;
+
+                // Get CSRF token from the cookie
+                const csrftoken = getCookie('csrftoken');
+
+                // Make AJAX request
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'create-train' %}",
+                    data: formData,
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function (response) {
+                        // Show success SweetAlert
+                        Swal.fire({
+                            title: "Success!",
+                            text: 'Train Created Successfully',
+                            icon: "success",
+                        }).then(() => {
+                            location.reload();
+                        });
+                        $('#CreateModal').modal('hide');
+                        $('.create-form').trigger('reset');
+                    },
+                    error: function (xhr, status, error) {
+                        // Show error SweetAlert
+                        showErrorAlert("An error occurred. Please try again.");
+                    },
+                });
+            });
+
+
+            // EDIT MODAL
+            $('.edit-btn').on('click', function (e) {
+                var editBtn = $(this);
+                var trainId = editBtn.data('id');
+
+                editBtn.addClass('d-none');
+                editBtn.siblings('.edit-loader-btn').removeClass('d-none');
+                // Make AJAX request to get train data
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'edit-train' 0 %}".replace('0', trainId),
+                    success: function (response) {
+                        // Set values in the form
+                        $('#Edit-form [name=edit_train_id]').val(response.train.id);
+                        $('#Edit-form [name=edit_train_name]').val(response.train.train_name);
+                        $('#Edit-form [name=edit_train_number]').val(response.train.train_number);
+                        $('#Edit-form [name=edit_train_type]').val(response.train.train_type);
+                        $('#Edit-form [name=edit_run_daily]').prop('checked', response.train.run_daily);
+                        $('#Edit-form [name=edit_departure_date]').val(response.train.departure_date);
+                        $('#Edit-form [name=edit_departure_station]').val(response.train.departure_station);
+                        $('#Edit-form [name=edit_arrival_station]').val(response.train.arrival_station);
+                        $('#Edit-form [name=edit_fare]').val(response.train.fare);
+                        $('#Edit-form [name=edit_booking_limit]').val(response.train.booking_limit);
+                        $('#Edit-form [name=edit_max_seats]').val(response.train.max_seats);
+
+                        $('#EditModal').modal('show');
+                        editBtn.removeClass('d-none');
+                        editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        showErrorAlert("An error occurred. Please try again.");
+                        editBtn.removeClass('d-none');
+                        editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                    }
+                });
+            });
+
+            $('#Edit-form').submit(function (e) {
+                e.preventDefault();
+
+                // Deserialize the serialized form data to an object
+                var formDataArray = $(this).serializeArray();
+                var formData = {};
+                for (var i = 0; i < formDataArray.length; i++) {
+                    formData[formDataArray[i].name] = formDataArray[i].value;
+                }
+
+                const csrftoken = getCookie('csrftoken');
+
+                // Add the train_id to the formData
+                formData['train_id'] = formData['edit_train_id'];
+
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'update-train' 0 %}".replace('0', formData['edit_train_id']),
+                    data: formData,
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            Swal.fire({
+                                title: "Success!",
+                                text: response.message,
+                                icon: "success",
+                            }).then(() => {
+                                location.reload();
+                            });
+                            $('#EditModal').modal('hide');
+                        } else {
+                            // Show error SweetAlert
+                            showErrorAlert("An error occurred. Please try again.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Show error SweetAlert
+                        showErrorAlert("An error occurred. Please try again.");
+                    },
+                });
+            });
+
+            $('.delete-btn').on('click', function () {
+                var deleteBtn = $(this);
+                var trainId = deleteBtn.data('id');
+                const csrftoken = getCookie('csrftoken');
+
+                // Show a confirmation SwalAlert
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    // If the user clicks 'Yes', proceed with the delete action
+                    if (result.isConfirmed) {
+                        deleteBtn.addClass('d-none');
+                        deleteBtn.siblings('.delete-loader-btn').removeClass('d-none');
+                        // Make an AJAX request to delete the train
+                        $.ajax({
+                            type: 'POST',
+                            url: "{% url 'delete-train' %}",
+                            data: {
+                                'train_id': trainId,
+                                csrfmiddlewaretoken: csrftoken
+                            },
+                            success: function (response) {
+                                // Show success SwalAlert
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    icon: 'success'
+                                }).then(() => {
+                                    // Reload the page after successful deletion
+                                    location.reload();
+                                });
+                                deleteBtn.removeClass('d-none');
+                                deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                            },
+                            error: function (xhr, status, error) {
+                                // Show error SwalAlert
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'An error occurred. Please try again.',
+                                    icon: 'error'
+                                });
+                                deleteBtn.removeClass('d-none');
+                                deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                            }
+                        });
+                    }
+                });
+            });
+
+            $('.display-btn').on('click', function () {
+                var displayBtn = $(this);
+                var trainId = displayBtn.data('id');
+                displayBtn.addClass('d-none');
+                displayBtn.siblings('.display-loader-btn').removeClass('d-none');
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'train-details' 0 %}".replace('0', trainId),
+                    success: function (response) {
+                        // Display train details in a table or any other format
+                        showTrainDetails(response);
+                        displayBtn.removeClass('d-none');
+                        displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred. Please try again.',
+                            icon: 'error'
+                        });
+                        displayBtn.removeClass('d-none');
+                        displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                    }
+                });
+            });
+
+            function showTrainDetails(trainData) {
+                // Set values in the train details modal
+                $('#display-trainName').text(trainData.train_name);
+                $('#display-trainNumber').text(trainData.train_number);
+                $('#display-trainType').text(trainData.train_type);
+                $('#display-runDaily').text(trainData.run_daily ? 'Yes' : 'No');
+                $('#display-departureDate').text(trainData.departure_date);
+                $('#display-departureStation').text(trainData.departure_station);
+                $('#display-arrivalStation').text(trainData.arrival_station);
+                $('#display-fare').text(trainData.fare);
+                $('#display-bookingLimit').text(trainData.booking_limit);
+                $('#display-maxSeats').text(trainData.max_seats);
+
+                // Show the train details modal
+                $('#trainDetailsModal').modal('show');
+            }
+
+            String.prototype.capitalize = function () {
+                return this.charAt(0).toUpperCase() + this.slice(1);
+            };
+        });
+    </script>
+    {% endblock train-index %}

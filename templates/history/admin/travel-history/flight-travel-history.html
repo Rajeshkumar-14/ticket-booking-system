@@ -1,0 +1,70 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Flight Travel History{% endblock title %}
+
+{% block flight-travel-history %}
+<div class="container-fluid flight-container p-1 m-0">
+    <div class="card text-light bg-blur border" style="height: 98vh; width: 100%; overflow-y: auto; ">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom">FLIGHT TRAVEL HSITORY</h5>
+        <div class="container mb-5 px-5" style="max-height: 750px; overflow-y: auto;">
+            {% if grouped_data %}
+            {% for key, group in grouped_data.items %}
+            <div class="card text-light bg-blur border text-center mt-2 mb-4" style="width: 100%;">
+                <h5 class="text-center mt-3">{{ key.0 }}</h5>
+                <h6 class="text-center">{{ key.1 }}</h6>
+                <hr class="bg-white">
+                <div class="card-body shadow" style="max-height: 500px; overflow: auto;">
+                    <table class="table admin-table table-bordered table-dark table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Passenger Name</th>
+                                <th>Seat Number</th>
+                                <th>Status</th>
+                                <th>Reserved By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation, flight in group %}
+                            <tr>
+                                <td>{{ reservation.passenger_names }}</td>
+                                <td>{{ reservation.seat_numbers }}</td>
+                                <td>{{ reservation.status }}</td>
+                                <td>{{ reservation.reservation_user }}</td>
+                                <td>
+
+                                    <button class="btn btn-success disabled">Completed</button>
+
+                                </td>
+                                <input type="hidden" name="reservation_user" id="reservation_user"
+                                    value="{{ reservation.reservation_user }}">
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success disabled"><i
+                            class="fa-solid fa-circle-check me-1"></i>Completed</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="container-fluid p-5">
+                <div class="card bg-dark text-light shadow-lg text-center p-5">
+                    <h5>No Flight Havn't Booked Yet.</h5>
+                    <a href="{% url 'administration-home' %}" class="btn btn-custom mt-3 btn-lg">Back to DashBoard</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock flight-travel-history %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+    });
+</script>
+{% endblock script %}

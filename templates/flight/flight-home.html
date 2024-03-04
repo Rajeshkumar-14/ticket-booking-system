@@ -1,0 +1,215 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}FLIGHT{% endblock title %}
+
+
+{% block flight-home %}
+<div class="container-fluid flight-container p-1 m-0">
+    <div class="card bg-blur text-light border" style="height: 98vh; overflow-y: auto; ">
+        <div class="container-fluid text-center home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+            <p>Your Trusted Travel Partner for Memorable Flights</p>
+        </div>
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom ">FLIGHT BOOKING</h5>
+        <div class="container">
+            <div class="card mt-2 bg-blur border ">
+                <h4 class="text-center mt-3 mb-3 text-light">Choose Departure & Destination</h4>
+                <hr class="text-light">
+                <div class="card-body shadow">
+                    <form method="POST" class="needs-validation reserveForm" id="reserveForm" novalidate>
+                        {% csrf_token %}
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="departure" name="departure">
+                                    <option value="" selected disabled>Select Departure Airport</option>
+                                    {% for airport in departure_airports %}
+                                    <option value="{{ airport }}">{{ airport }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="departure">Departure Airport</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="destination" name="destination">
+                                    <option value="" selected disabled>Select Destination Airport</option>
+                                    {% for airport in destination_airports %}
+                                    <option value="{{ airport }}">{{ airport }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="destination">Destination Airport</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="flightType" name="flight_type">
+                                    <option value="" selected disabled>Select Flight Type</option>
+                                    {% for flight_type in flight_types %}
+                                    <option value="{{ flight_type.0 }}">{{ flight_type.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="flightType">Flight Type</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="date" placeholder="DD/MM/YYYY">
+                                    <label for="date">Travel Date</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn mt-1 btn-custom align-content-center">Find Flight</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="flightModal" tabindex="-1" role="dialog" aria-labelledby="flightModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content bg-dark text-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flightModalLabel">Available Flights</h5>
+                <button type="button" class="btn btn-close bg-white" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <table
+                    class="table available-detail-table table-bordered table-striped table-dark table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>Flight Type</th>
+                            <th>Date</th>
+                            <th>Departure Airport</th>
+                            <th>Destination Airport</th>
+                            <th>Fare</th>
+                            <th>Max Seats</th>
+                            <th>Reserve</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flightTableBody">
+                        <!-- Flight details will be filled dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock flight-home %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.reserveForm').submit(function (e) {
+            e.preventDefault();
+
+            const departure = $('#departure').val();
+            const destination = $('#destination').val();
+            const flight_type = $('#flightType').val();
+            const date = $('#date').val();
+
+            // Check if options are selected
+            if (departure === "" || destination === "" || flight_type === "" || date === "") {
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Please fill all the fields',
+                    icon: 'warning',
+                });
+                return;
+            }
+            if (departure === destination || destination === departure) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Starting Point & Ending Point Cannot be Same',
+                    icon: 'Error',
+                });
+                return;
+            }
+
+            // Get the CSRF token from the cookies
+            const csrftoken = getCookie('csrftoken');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'check-flight-availability' %}",
+                data: {
+                    'departure': departure,
+                    'destination': destination,
+                    'flight_type': flight_type,
+                    'date': date,
+                    csrfmiddlewaretoken: csrftoken,  // Include the CSRF token
+                },
+                success: function (data) {
+                    if (data.available) {
+                        // Populate the flight details in the modal table
+                        const flightDetails = data.flight_details;
+                        if (flightDetails) {
+                            const tableRow = `
+                        <tr>
+                            <td>${flightDetails.flight_type}</td>
+                            <td>${flightDetails.journey_date}</td>
+                            <td>${flightDetails.departure_airport}</td>
+                            <td>${flightDetails.destination_airport}</td>
+                            <td>${flightDetails.fare}</td>
+                            <td>${flightDetails.max_seats}</td>
+                            <td>
+                                <button class="btn btn-custom reserve-button" data-flight-id="${flightDetails.flight_id}">Reserve</button>
+                            </td>
+                        </tr>`;
+                            $('#flightTableBody').html(tableRow);
+
+                            // Show the modal
+                            $('#flightModal').modal('show');
+
+                            // Attach a click event for the reservation button
+                            $('.reserve-button').click(function () {
+                                const flightId = $(this).data('flight-id');
+                                // Redirect to 'flight-reservation' with the selected flight ID
+                                window.location.href = "{% url 'flight-reservation' 0 %}".replace('0', flightId);
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Sorry',
+                            text: 'No flights are available for your current selection',
+                            icon: 'error',
+                        });
+                    }
+                },
+                error: function () {
+                    // Handle the error case here
+                    Swal.fire({
+                        title: 'Sorry',
+                        text: 'An error occurred, please try again.',
+                        icon: 'error',
+                    });
+                }
+            });
+        });
+
+        // Function to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock script %}

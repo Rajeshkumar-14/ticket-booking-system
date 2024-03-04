@@ -1,0 +1,46 @@
+/* Bus Home */
+.bus-container {
+    height: 100vh;
+    background-image: linear-gradient(rgba(4, 9, 30, 0.7), rgba(4, 9, 30, 0.7)), url('/static/core/images/bus-background.jpg');
+    background-position: center;
+    background-size: cover;
+    position: relative;
+    padding: 0;
+}
+
+/* END */
+
+/* BUS Reservation */
+.seats {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    /* Align seats vertically to the center */
+    justify-content: center;
+    /* Align seats horizontally to the center */
+}
+
+.seat {
+    display: flex;
+    flex: 0 0 10%;
+    padding: 5px;
+    margin: 5px;
+    /* Add margin to provide space between seats */
+    position: relative;
+    text-align: center;
+}
+
+.cabin ol {
+    list-style-type: none;
+    /* Remove list markers (::marker) */
+}
+
+/* END */
+.custom-bus-card {
+    background-image: linear-gradient(rgba(4, 9, 30, 0.7), rgba(4, 9, 30, 0.7)), url('/static/core/images/background.jpg') !important;
+    background-position: center;
+    background-size: cover;
+    position: relative;
+    padding: 0;
+}

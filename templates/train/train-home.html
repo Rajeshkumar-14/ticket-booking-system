@@ -1,0 +1,217 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}TRAIN{% endblock title %}
+
+
+{% block train-home %}
+<div class="container-fluid train-container p-1 m-0">
+    <div class="card bg-blur border border-white text-light" style="  height: 98vh; overflow-y: auto; ">
+        <div class="container-fluid text-center home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+            <p>Your Trusted Travel Partner for Memorable Train Journeys</p>
+        </div>
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom">TRAIN BOOKING</h5>
+        <div class="container">
+            <div class="card mt-2 bg-blur border">
+                <h4 class="text-center mt-3 mb-3 text-light">Choose Departure & Arrival Stations</h4>
+                <hr class="text-light">
+                <div class="card-body shadow">
+                    <form method="POST" class="needs-validation reserveForm" id="reserveForm" novalidate>
+                        {% csrf_token %}
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="startPoint" name="departure_station">
+                                    <option value="" selected disabled>Select Departure Station</option>
+                                    {% for point in starting_points %}
+                                    <option value="{{ point }}">{{ point }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="startPoint">Departure Station</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="endPoint" name="arrival_station">
+                                    <option value="" selected disabled>Select Arrival Station</option>
+                                    {% for point in ending_points %}
+                                    <option value="{{ point }}">{{ point }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="endPoint">Arrival Station</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" id="trainType" name="train_type">
+                                    <option value="" selected disabled>Select Train Type</option>
+                                    {% for train_type in train_types %}
+                                    <option value="{{ train_type.0 }}">{{ train_type.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="trainType">Train Type</label>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-12 mb-3">
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <input type="date" class="form-control" id="date" placeholder="DD/MM/YYYY">
+                                    <label for="date">Travel Date</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn mt-1 btn-custom align-content-center">Find Train</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="trainModal" tabindex="-1" role="dialog" aria-labelledby="trainModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content modal-dialog-scrollable bg-dark text-center">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="trainModalLabel">Available Trains</h5>
+                <button type="button" class="btn btn-close bg-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add a table here to display train details -->
+                <table
+                    class="table table-bordered available-detail-table table-striped table-dark table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>Train Type</th>
+                            <th>Date</th>
+                            <th>Departure Station</th>
+                            <th>Arrival Station</th>
+                            <th>Fare</th>
+                            <th>Max Seats</th>
+                            <th>Reserve</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trainTableBody">
+                        <!-- Train details will be filled dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock train-home %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+
+        $('.reserveForm').submit(function (e) {
+            e.preventDefault();
+
+            const departure_station = $('#startPoint').val();
+            const arrival_station = $('#endPoint').val();
+            const train_type = $('#trainType').val();
+            const date = $('#date').val();
+
+            // Check if options are selected
+            if (departure_station === "" || arrival_station === "" || train_type === "" || date === "") {
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Please fill all the fields',
+                    icon: 'warning',
+                });
+                return;
+            }
+            if (departure_station === arrival_station || arrival_station === departure_station) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Starting Point & Ending Point Cannot be Same',
+                    icon: 'error',
+                });
+                return;
+            }
+
+            // Get the CSRF token from the cookies
+            const csrftoken = getCookie('csrftoken');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'check-train-availability' %}",
+                data: {
+                    'start_point': departure_station,
+                    'end_point': arrival_station,
+                    'train_type': train_type,
+                    'date': date,
+                    csrfmiddlewaretoken: csrftoken,  // Include the CSRF token
+                },
+                success: function (data) {
+                    if (data.available) {
+                        // Populate the train details in the modal table
+                        const trainDetails = data.train_details;
+                        if (trainDetails) {
+                            const tableRow = `
+                                <tr>
+                                    <td>${trainDetails.train_type}</td>
+                                    <td>${trainDetails.departure_date}</td>
+                                    <td>${trainDetails.departure_station}</td>
+                                    <td>${trainDetails.arrival_station}</td>
+                                    <td>${trainDetails.fare}</td>
+                                    <td>${trainDetails.max_seats}</td>
+                                    <td>
+                                        <button class="btn btn-custom reserve-button" data-train-id="${trainDetails.train_id}">Reserve</button>
+                                    </td>
+                                </tr>`;
+                            $('#trainTableBody').html(tableRow);
+
+                            // Show the modal
+                            $('#trainModal').modal('show');
+
+                            // Attach a click event for the reservation button
+                            $('.reserve-button').click(function () {
+                                const trainId = $(this).data('train-id');
+                                // Redirect to 'train-reservation' with the selected train ID
+                                window.location.href = "{% url 'train-reservation' 0 %}".replace('0', trainId);
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Sorry',
+                            text: 'No trains are available for your current selection',
+                            icon: 'error',
+                        });
+                    }
+                },
+                error: function () {
+                    // Handle the error case here
+                    Swal.fire({
+                        title: 'Sorry',
+                        text: 'An error occurred, please try again.',
+                        icon: 'error',
+                    });
+                }
+            });
+        });
+
+        // Function to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock script %}

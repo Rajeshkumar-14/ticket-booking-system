@@ -1,0 +1,233 @@
+{% extends 'core/base.html' %}
+{% block title %}SUPPORT{% endblock title %}
+
+{% block support-home %}
+<div class="container-fluid text-white">
+    <div class="container">
+        <div class="card bg-blur border border-white text-white mt-3">
+            <!-- Page Loader -->
+            {% include 'core/page-loader.html' %}
+            <div class="card-header text-center text-uppercase border-bottom p-3">
+                <h2>Support Page</h2>
+            </div>
+            <div class="text-white p-3 px-5 bg-blur border-bottom">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 mt-2">
+                            <div class="d-flex align-items-start user-icon">
+                                <i class="fa-solid fa-user me-3"></i>
+                                <h1 class="badge bg-primary user-icon text-white">ADMIN</h1>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end mt-2">
+                            <div class="d-flex justify-content-end align-items-center">
+                                {% if user_status == "Online" %}
+                                <div class="online-indicator">
+                                    <span class="online-blink"></span>
+                                </div>
+                                {% else %}
+                                <div class="offline-indicator">
+                                    <span class="offline-blink"></span>
+                                </div>
+                                {% endif %}
+                                <small>{{ user_status }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body chat-box" style="height: 400px; overflow-y: auto;" id="chat-box">
+                <!-- Messages will be loaded here via Ajax -->
+            </div>
+
+            <div class="card-footer border-top p-3">
+                <form id="message-form">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <textarea name="message" class="form-control" placeholder="Type your message"
+                            id="chat-content"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="send-message-btn">Send</button>
+
+                    <button type="button" class="btn btn-danger float-end" id="clear-conversation-btn">Clear
+                        Conversation</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<style>
+    div.online-indicator {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+
+        background-color: #0fcc45;
+        border-radius: 50%;
+
+        position: relative;
+    }
+
+    span.online-blink {
+        display: block;
+        width: 15px;
+        height: 15px;
+
+        background-color: #0fcc45;
+        opacity: 0.7;
+        border-radius: 50%;
+
+        animation: online-blink 1s linear infinite;
+    }
+
+    div.offline-indicator {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+
+        background-color: #cc0f0f;
+        border-radius: 50%;
+
+        position: relative;
+    }
+
+    span.offline-blink {
+        display: block;
+        width: 15px;
+        height: 15px;
+
+        background-color: #cc0f0f;
+        opacity: 0.7;
+        border-radius: 50%;
+
+        animation: offline-blink 1s linear infinite;
+    }
+
+    @keyframes online-blink {
+        100% {
+            transform: scale(2, 2);
+            opacity: 0;
+        }
+    }
+
+    @keyframes offline-blink {
+        100% {
+            transform: scale(2, 2);
+            opacity: 0;
+        }
+    }
+</style>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+
+        loadMessages();
+
+        var messageInterval;
+
+        function loadMessages() {
+            $.ajax({
+                url: "{% url 'load-messages' %}",
+                type: "GET",
+                success: function (data) {
+                    $("#chat-box").empty();
+                    data.messages.forEach(function (message) {
+                        const isSender = message.sender === '{{ request.user.username }}';
+
+                        $("#chat-box").append(
+                            `<div class="d-flex mb-2 p-2 ${isSender ? 'justify-content-end' : 'justify-content-start'}">
+                        ${isSender ? '' : '<i class="fa-solid fa-user mt-2"></i>'}
+                        <h6 class="bg-${isSender ? 'primary' : 'secondary'} text-white rounded p-2 ${isSender ? 'me-3' : 'ms-3'}">${message.content}</h6>
+                        ${isSender ? '<i class="fa-solid fa-user mt-2"></i>' : ''}
+                    </div>`
+                        );
+                    });
+                    if (data.messages.length > 0) {
+                        $("#clear-conversation-btn").removeClass('d-none').addClass('d-visible');
+                    } else {
+                        $("#clear-conversation-btn").removeClass('d-visible').addClass('d-none');
+                    }
+                    $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
+                    $('#chat-content').val('');
+                },
+                error: function (error) {
+                    Swal.fire("Error", "Error Loading Messages, Try again later.", "error");
+                }
+            });
+        }
+
+        function startMessageInterval() {
+            messageInterval = setInterval(loadMessages, 2000);
+        }
+
+        function stopMessageInterval() {
+            clearInterval(messageInterval);
+        }
+
+        // Start the interval initially
+        startMessageInterval();
+
+        // Set up event listeners to stop and start the interval when the input field is focused or blurred
+        $('#chat-content').focus(function () {
+            stopMessageInterval();
+        });
+
+        $('#chat-content').blur(function () {
+            startMessageInterval();
+        });
+        // Function to handle sending messages via Ajax
+        $("#send-message-btn").click(function () {
+            $.ajax({
+                url: "{% url 'support-home' %}",
+                type: "POST",
+                data: $("#message-form").serialize(),
+                success: function (data) {
+                    loadMessages();
+                },
+                error: function (error) {
+                    Swal.fire("Error", "Error Sending Message, Please try after sometime.", "error");
+                }
+            });
+        });
+        // Function to handle clear conversation
+        $("#clear-conversation-btn").click(function () {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to clear this Conversation.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    // User confirmed the action, send the AJAX request
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'clear-conversation' %}",
+                        data: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}"
+                        },
+                        success: function (response) {
+                            Swal.fire("Cleared!", "Conversation Cleared Successfully", "success").then(function () {
+                                loadUserMessages(response.user_id);
+                            });
+                        },
+                        error: function (error) {
+                            Swal.fire("Error", "Error While Clearing Conversation", "error");
+
+                        }
+                    });
+                }
+            });
+
+
+        });
+    });
+</script>
+{% endblock support-home %}

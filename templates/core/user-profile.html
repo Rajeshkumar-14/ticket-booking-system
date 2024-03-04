@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+{% block user-profile %}
+<div class="container-fluid">
+    <div class="card border text-light border-white bg-blur mt-3 p-3 pb-5" id="user-profile">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h4 class="text-center mb-3 mt-3">USER DETAILS</h4>
+        <hr>
+        {% for user_profile in user_profile %}
+        <div class="card-body shadow">
+            <div class="row">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">USER ID :</div>
+                        <div class="col-8">{{ request.user.id }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">USERNAME :</div>
+                        <div class="col-8">{{ request.user.username }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">EMAIL :</div>
+                        <div class="col-8">{{ request.user.email }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">GENDER :</div>
+                        <div class="col-8">{{ user_profile.gender }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">AGE :</div>
+                        <div class="col-8">{{ user_profile.age }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">Date of Birth :</div>
+                        <div class="col-8">{{ user_profile.date_of_birth }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">Aadhaar Number :</div>
+                        <div class="col-8">{{ user_profile.aadhaar_number }}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-4 font-weight-bold">PHONE NUMBER :</div>
+                        <div class="col-8">{{ user_profile.phone_number }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <hr>
+            <a href="{% url 'edit_user_profile' %}" class="btn btn-custom w-100 mt-3">EDIT PROFILE</a>
+        </div>
+    </div>
+</div>
+{% endblock user-profile %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+    });
+</script>
+{% endblock script %}

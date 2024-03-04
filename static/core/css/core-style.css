@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
+body{
+    font-family: 'Poppins', sans-serif;
+}
+/* Side-Bar Hover Effect */
+.side-bar {
+    z-index: 99;
+}
+.side-bar a {
+    display: block;
+    text-align: left;
+    margin-left: 2px;
+    padding: 10px 0;
+    transition: background 0.3s, color 0.3s;
+    text-decoration: none;
+    border: none;
+}
+
+.side-bar a i {
+    padding-left: 12px;
+}
+
+.side-bar a:hover {
+    color: black;
+    background: #472bff;
+    border-radius: 5px;
+    border: none;
+}
+
+.side-bar ul li {
+    list-style: none;
+}
+
+.side-bar ul li a {
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+}
+
+.side-bar ul li a:hover {
+    background: #472bff;
+}
+
+
+/* END */
+
+/* Right Side Alignment */
+.right-side {
+    background-image: linear-gradient(rgba(4, 9, 30, 0.7), rgba(4, 9, 30, 0.7)), url('/static/core/images/background.jpg');
+    background-position: center;
+    background-size: cover;
+    position: relative;
+    padding: 0;
+}
+
+/* END */
+
+
+/* Index Header */
+.home-header {
+    transition: all 0.3s;
+}
+
+.home-header:hover {
+    backdrop-filter: blur(10px);
+    text-shadow: 0px 2px 5px rgba(255, 255, 255, 0.7);
+}
+
+.home-header hr {
+    background-color: white;
+    height: 2px;
+    margin: 20px 0;
+}
+
+/* END */

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ticket booking system"
+version = "0.1.0"
+description = "Ticket Booking System using Django & Python."
+authors = ["RajeshKumar <https://github.com/Rajeshkumar-14>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.6"
+django-environ = "^0.11.2"
+celery = "^5.3.4"
+redis = "^5.0.1"
+xhtml2pdf = "^0.2.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

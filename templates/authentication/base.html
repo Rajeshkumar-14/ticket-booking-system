@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap Link -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- Icon LInk -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <!-- Custom Style Sheets -->
+    <link rel="stylesheet" href="{% static 'authentication/css/login-style.css' %}">
+
+    <!-- Success Page Icon -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap" rel="stylesheet">
+</head>
+
+
+
+<body>
+    {% block registration %}
+    {% endblock registration %}
+
+    {% block login %}
+    {% endblock login %}
+
+    {% block success %}
+    {% endblock success %}
+
+    {% block reset-email %}
+    {% endblock reset-email %}
+
+    {% block reset-password %}
+    {% endblock reset-password %}
+
+    {% block script %}
+    {% endblock script %}
+
+    <script src="{% static 'authentication/js/login-script.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+</body>
+
+
+</html>

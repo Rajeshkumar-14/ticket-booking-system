@@ -1,0 +1,153 @@
+{% extends 'administration/base.html' %}
+{% block edit-admin-profile %}
+<div class="container-fluid " style="min-height: 98vh;">
+    <div class="card bg-blur text-white border border-white mt-3 p-3 pb-5">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <h4 class="text-center mb-3 mt-3">EDIT PROFILE</h4>
+        <hr>
+        <div class="card-body shadow-lg">
+            <div>
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" id="edit-profile-form"
+                    novalidate>
+                    {% csrf_token %}
+                    <div class="col-12">
+
+                        <div class="form-floating">
+                            <select class="form-select mb-3" name="gender" id="gender"
+                                aria-label="Floating label select example">
+                                <option value="" disabled>Select Gender</option>
+                                {% for choice in GENDER_CHOICES %}
+                                {% if choice.0 == user_profile.gender %}
+                                <option value="{{ choice.0 }}" selected>{{ choice.1 }}</option>
+                                {% else %}
+                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <label for="floatingSelect">Update Gender</label>
+                        </div>
+                    </div>
+
+                    <!--  -->
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input class="form-control mb-3" type="text" placeholder="Age" name="age" id="age" required
+                                value="{{ user_profile.age }}" />
+                            <label for="floatingInput">Age</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" type="date" name="date_of_birth" id="date_of_birth" required
+                                value="{% if user_profile.date_of_birth %}{{ user_profile.date_of_birth|date:'Y-m-d' }}{% endif %}"
+                                placeholder="" />
+                            <label for="date_of_birth">Date of Birth</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input class="form-control mb-3" type="text" placeholder="Aadhaar Number"
+                                id="aadhaar_number" name="aadhaar_number" required
+                                value="{{ user_profile.aadhaar_number }}" />
+                            <label for="floatingInput">Aadhaar Number</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input class="form-control mb-3" type="text" placeholder="Phone Number" id="phone_number"
+                                name="phone_number" required value="{{ user_profile.phone_number }}" />
+                            <label for="floatingInput">Phone Number</label>
+                        </div>
+
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100" id="update-btn">UPDATE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock edit-admin-profile %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+        // Enable Bootstrap form validation
+        (function () {
+            'use strict';
+
+            var forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+        function handleMessages() {
+            {% if messages %}
+            {% for message in messages %}
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: "{{ message|safe }}",
+            });
+            {% endfor %}
+            {% endif %}
+        }
+
+        // Call the function to handle messages when the document is ready
+        document.addEventListener("DOMContentLoaded", function () {
+            handleMessages();
+        });
+        // AJAX call to Update the User-Profile Details
+        $(document).ready(function () {
+            $('#edit-profile-form').on('submit', function (e) {
+                e.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "edit_user_profile" %}',
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'Your profile has been updated successfully.',
+                                icon: 'success',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '{% url "admin_profile" %}';
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        });
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    }); 
+</script>
+{% endblock script %}

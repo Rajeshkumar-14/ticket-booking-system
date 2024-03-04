@@ -1,0 +1,458 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}FLIGHT-Reservation{% endblock title %}
+
+{% block flight-reservation %}
+<div class="container-fluid flight-container p-2">
+    <!-- Page Loader -->
+    {% include 'core/page-loader.html' %}
+    <div class="card bg-blur text-light border" style="min-height: 300px; max-height: 98vh;">
+        <div class="card-header text-center p-2">
+            <h3>SELECT SEATS</h3>
+            <h5>BOOKING LIMIT <span>(Per User)</span> : {{ flight.booking_limit }} </h5>
+            <div class="btn-group text-center">
+                <button class="btn btn-custom me-1 btn-sm "><i
+                        class="fa-solid mt-1 fa-couch me-2"></i>AVAILABLE</button>
+                <button class="btn btn-success me-1 btn-sm"><i class="fa-solid mt-1 fa-couch me-2"></i>SELECTED</button>
+                <button class="btn btn-danger disabled btn-sm"><i
+                        class="fa-solid mt-1 fa-couch me-2"></i>BOOKED</button>
+            </div>
+        </div>
+        <hr class="p-0 m-0 text-light">
+        <div class="card-body shadow overflow-y-auto">
+            <div class="row">
+                <!-- Reservation Loader -->
+                {% include 'core/reservation-loader.html' %}
+                <div class="col-9">
+                    <div class="flight-id" data-flight-id="{{ flight.id }}"></div>
+                    <div class="flight-cabin" data-max-seats="{{ flight.max_seats }}"></div>
+                    <div class="flight-fare" data-fare-price="{{ flight.fare }}"></div>
+                    <div class="flight-booking_limit" data-booking-limit="{{ flight.booking_limit }}"></div>
+                    <div class="remaining_booking_limit" data-remaining-limit="{{ remaining_seats }}"></div>
+
+                    <ol class="cabin reservation-container flight-cabin p-2 bg-dark rounded-2 position-relative"
+                        id="seatMap">
+                        <!-- Reservation Block Overlay -->
+                        <div class="reservation-block-overlay position-absolute top-0 start-0 w-100 h-100 rounded-2 d-none">
+                            <div class="card bg-dark text-center shadow">
+                                <h5 class="fw-bold p-0 m-3 text-light"><i class="fa-solid text-warning fa-triangle-exclamation me-2"></i>
+                                    BOOKING LIMIT REACHED</h5>
+                            </div>
+                        </div>
+                    </ol>
+
+                </div>
+                <div class="col-3 text-center ">
+                    <div class="position-fixed reservation-container bg-dark p-3 rounded-2">
+                        <div class="px-2 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="mb-3 text-light">
+                                    <h3>SELECTED SEATS :</h3>
+                                    <div class="table-responsive mt-3"
+                                        style="min-height: 75px; max-height: 100px; overflow-y: auto; min-width: 225px;">
+                                        <table
+                                            class="table table-bordered table-striped reservation-detail-table table-dark table-hover">
+                                            <tbody id="selectedSeatsList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <hr class="bg-dark">
+                                <div class="mt-4">
+                                    <table
+                                        class="table table-bordered table-striped-columns reservation-detail-table table-dark table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h5>TOTAL SEATS:</h5>
+                                                </td>
+                                                <td>
+                                                    <p id="selectedSeatsCount"></p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h5>TOTAL FARE:</h5>
+                                                </td>
+                                                <td>
+                                                    <p id="TotalFare"></p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h5>YOUR LIMIT:</h5>
+                                                </td>
+                                                <td>
+                                                    <p id="RemaningLimit"></p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-custom mb-3 flight-reserveButton">RESERVE</button>
+                                <button
+                                    class="btn btn-custom mb-3 bg-custom border-custom reserve-loading-btn me-2 disabled d-none">
+                                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                                    <span role="status">RESERVING</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Add this inside the bus-reservation block -->
+<div class="modal" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog- modal-dialog-scrollable modal-xl">
+        <div class="modal-content bg-dark text-center">
+            <div class="modal-header">
+                <h5 class="modal-title"> Enter User Details</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <form method="POST" class="needs-validation userdetailform" novalidate>
+                        {% csrf_token %}
+                        <table
+                            class="table table-bordered reservation-detail-table table-striped table-dark table-hover rounded-2">
+                            <thead>
+                                <tr>
+                                    <th>Seat</th>
+                                    <th>Name</th>
+                                    <th>ID Proof (JPG/PNG/PDF)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="userDetailsFields">
+                                <!-- Dynamically generated input fields will go here -->
+                            </tbody>
+                        </table>
+                        <hr class="text-light ">
+                        <button type="submit" class="btn btn-custom" id="confirmReservation">Confirm
+                            Reservation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="application/json" id="booked-seat-list">
+    {{ booked_seat_list_json | safe }}
+</script>
+{% endblock flight-reservation %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        const csrfToken = getCookie("csrftoken");
+        // Function to calculate total fare and update the display
+        function updateTotalFare() {
+            const selectedSeats = $('.selected').map(function () {
+                return $(this).data('seat');
+            }).get();
+
+            const totalFare = selectedSeats.length * farePrice;
+
+            $('#TotalFare').text('₹' + totalFare);
+            $('#selectedSeatsCount').text(selectedSeats.length);
+
+            const selectedSeatsList = $('#selectedSeatsList');
+            selectedSeatsList.empty();
+
+            // Define the number of columns (5)
+            const columns = 5;
+
+            for (let i = 0; i < selectedSeats.length; i += columns) {
+                const row = $('<tr></tr>');
+                for (let j = 0; j < columns; j++) {
+                    const index = i + j;
+                    if (index < selectedSeats.length) {
+                        row.append('<td class="w-25">' + selectedSeats[index] + '</td>');
+                    }
+                }
+                selectedSeatsList.append(row);
+            }
+        }
+
+        // Function to toggle seat selection
+        function toggleSeat() {
+            const seat = $(this);
+            if (seat.hasClass('occupied') || seat.hasClass('blocked')) {
+                return;
+            }
+
+            const remainingLimitElement = $('#RemaningLimit');
+            let remainingLimit = parseInt(remainingLimitElement.text());
+
+            if (remainingLimit === 0 && !seat.hasClass('selected')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'LIMIT REACHED',
+                    text: 'You can only book up to ' + bookinglimit + ' seats, and you reached your limit.',
+                });
+                return;
+            }
+
+            if (seat.hasClass('selected')) {
+                seat.removeClass('selected bg-success border-success');
+                remainingLimitElement.text(remainingLimit + 1); // Increment remaining limit
+            } else {
+                if ($('.selected').length >= bookinglimit) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'LIMIT REACHED',
+                        text: 'You can only book up to ' + bookinglimit + ' seats, and you reached your limit.',
+                    });
+                    return;
+                }
+                seat.addClass('selected bg-success border-success');
+                remainingLimitElement.text(remainingLimit - 1); // Decrement remaining limit
+            }
+            updateTotalFare(); // Update total fare when a seat is selected/unselected
+        }
+        function checkRemainingLimit(remaining_limit) {
+            let remainingLimit = remaining_limit;
+            $('#RemaningLimit').text(remainingLimit);
+
+            if (remainingLimit === 0) {
+                $('.reservation-block-overlay').removeClass('d-none');
+                $('.bus-reserveButton').addClass('btn-secondary disabled').removeClass('btn-custom');
+            } else {
+                $('.reservation-block-overlay').addClass('d-none');
+                $('.bus-reserveButton').removeClass('btn-secondary disabled').addClass('btn-custom');
+            }
+        }
+        function updateTable() {
+            $('#TotalFare').text('₹ 0');
+            $('#selectedSeatsCount').text('0');
+            $('#selectedSeatsList').empty();
+        }
+
+        const seatMap = $('#seatMap');
+        const maxSeats = $('.flight-cabin').data('max-seats');
+        const farePrice = $('.flight-fare').data('fare-price');
+        const bookinglimit = $('.flight-booking_limit').data('booking-limit');
+        const tripId = $('.flight-id').data('flight-id');
+        const RemainingLimit = $('.remaining_booking_limit').data('remaining-limit');
+
+        checkRemainingLimit(RemainingLimit);
+        updateTable();
+
+
+
+        const seatsPerRow = 5; // Number of seats per row
+        const fullRows = Math.floor(maxSeats / seatsPerRow);
+        const remainingSeats = maxSeats % seatsPerRow;
+        const bookedSeatListScript = document.getElementById("booked-seat-list");
+        const booked_seat_list = JSON.parse(bookedSeatListScript.textContent);
+
+        let seatCount = 0;
+
+        for (let row = 1; row <= fullRows; row++) {
+            const rowElement = $('<li class="row row--' + row + '"></li>');
+            const seatsElement = $('<ol class="seats mb-2" type="A"></ol');
+
+            for (let seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+                if (seatCount >= maxSeats) {
+                    break;
+                }
+                const seatNumId = row * 10 + seatNum;
+                const seatId = row + String.fromCharCode(64 + seatNum);
+                let seatButton;
+
+                if (seatNumId < 100) {
+                    if (seatNum === 3) {
+                        if (booked_seat_list.includes(seatId)) {
+                            seatButton = $('<li class="seat btn occupied disabled bg-danger border-danger btn-custom me-5" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + '0' + seatId + '</li>');
+                        } else {
+                            seatButton = $('<li class="seat btn btn-custom me-5" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + '0' + seatId + '</li>');
+                            seatButton.on('click', toggleSeat);
+                        }
+                    } else {
+                        if (booked_seat_list.includes(seatId)) {
+                            seatButton = $('<li class="seat btn occupied disabled bg-danger border-danger btn-custom" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + '0' + seatId + '</li>');
+                        } else {
+                            seatButton = $('<li class="seat btn btn-custom " data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + '0' + seatId + '</li>');
+                            seatButton.on('click', toggleSeat);
+                        }
+                    }
+                } else {
+                    if (seatNum === 3) {
+                        if (booked_seat_list.includes(seatId)) {
+                            seatButton = $('<li class="occupied disabled bg-danger border-danger btn-custom me-5" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + seatId + '</li>');
+                        } else {
+                            seatButton = $('<li class="seat btn btn-custom me-5" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + seatId + '</li>');
+                            seatButton.on('click', toggleSeat);
+                        }
+                    } else {
+                        if (booked_seat_list.includes(seatId)) {
+                            seatButton = $('<li class="occupied disabled bg-danger border-danger btn-custom" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + seatId + '</li>');
+                        } else {
+                            seatButton = $('<li class="seat btn btn-custom" data-seat="' + seatId + '">' + '<i class="fa-solid mt-1 fa-couch me-2"></i>' + seatId + '</li>');
+                            seatButton.on('click', toggleSeat);
+                        }
+                    }
+                }
+
+                seatsElement.append(seatButton);
+                seatCount++;
+            }
+
+            rowElement.append(seatsElement);
+            seatMap.append(rowElement);
+        }
+        console.log(booked_seat_list)
+
+        $('.flight-reserveButton').click(function () {
+            const selectedSeats = $('.selected').map(function () {
+                return $(this).data('seat');
+            }).get();
+            if (selectedSeats.length === '' || selectedSeats.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'EMPTY SUBMISSION',
+                    text: "Reservation can't be Empty. Please select some seats.",
+                });
+                return;
+            }
+            if (selectedSeats.length > bookinglimit) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'LIMIT REACHED',
+                    text: 'You can only book up to ' + bookinglimit + ' seats.',
+                });
+                return;
+            }
+            const userDetailsFields = $('#userDetailsFields');
+            userDetailsFields.empty();
+
+            for (let i = 0; i < selectedSeats.length; i++) {
+                const seatId = selectedSeats[i];
+                const inputGroup = $(
+                    '<tr>' +
+                    '<td>Seat ' + seatId + '</td>' +
+                    '<td><input type="text" data-seat-id="' + seatId + '" class="form-control" id="name' + i + '" placeholder="Enter Name for Seat ' + seatId + '"></td>' +
+                    '<td><input type="file" class="form-control" id="idProof' + i + '" placeholder="Upload ID Proof (JPG/PNG/PDF)"></td>' +
+                    '</tr>'
+                );
+                userDetailsFields.append(inputGroup);
+            }
+
+            $('#userDetailsModal').modal('show');
+        });
+
+        // Handle the "Confirm Reservation" button click
+        let fileNames = [];
+        $('.userdetailform').on('submit', function (event) {
+            event.preventDefault();
+            const selectedSeats = $('.selected').map(function () {
+                return $(this).data('seat');
+            }).get();
+
+            const formData = new FormData();
+            let duplicateFound = false; // Flag to track duplicate file names
+
+            for (let i = 0; i < selectedSeats.length; i++) {
+                const name = $('#name' + i).val().trim(); // Remove trailing spaces
+                const idProof = $('#idProof' + i).prop('files')[0];
+                const seatId = $('#name' + i).data('seat-id');
+
+                // Validation: Check if name or ID proof is empty
+                if (!name || !idProof) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Name and ID Proof are required for all seats.',
+                    });
+                    return; // Stop form submission on error
+                }
+
+                // Check if the file name is duplicate
+                let fileName = idProof.name.toLowerCase(); // Convert file name to lowercase
+                if (fileNames.includes(fileName)) {
+                    duplicateFound = true;
+                    break; // Exit the loop if duplicate found
+                }
+
+                // Append the user details to the FormData
+                if (!duplicateFound) {
+                    formData.append('name', name);
+                    formData.append('id_proof', idProof);
+                    formData.append('seat_number', seatId);
+                    formData.append('trip_id', tripId); // Ensure you have 'trip_id' defined correctly
+                }
+
+                fileNames.push(fileName);
+            }
+
+            if (duplicateFound) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Duplicate file name found. Each ID Proof must have a unique file name.',
+                });
+                fileNames = [];
+                return; // Stop form submission on error
+            }
+            $('#userDetailsModal').modal('hide');
+
+            $('.flight-reserveButton').addClass("d-none");
+            $('.reserve-loading-btn').removeClass("d-none");
+            $('.reservation-loader').removeClass('d-none');
+            $.ajax({
+                type: "POST",
+                url: "{% url 'save-flight-reservation' %}",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                success: function (response) {
+                    $('#userDetailsModal').modal('hide');
+                    Swal.fire({
+                        title: "Success!",
+                        text: "RESERVATION WAS SUCCESSFUL.",
+                        icon: "success",
+                    });
+                    $('.flight-reserveButton').removeClass("d-none");
+                    $('.reserve-loading-btn').addClass("d-none");
+                    $('.reservation-loader').addClass('d-none');
+                    $('.selected').addClass('occupied disabled bg-danger border-danger');
+                    $('.selected').removeClass('selected bg-success border-success');
+                    // Empty the fileNames array
+                    fileNames = [];
+                    checkRemainingLimit(response.remaining_limit);
+                    updateTable();
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = xhr.responseJSON.error || "An error occurred";
+                    Swal.fire({
+                        title: "Error!",
+                        text: errorMessage,
+                        icon: "error",
+                    });
+                    $('.flight-reserveButton').removeClass("d-none");
+                    $('.reserve-loading-btn').addClass("d-none");
+                    $('.reservation-loader').addClass('d-none');
+                    // Empty the fileNames array
+                    fileNames = [];
+                }
+            });
+        });
+    });
+</script>
+{% endblock script %}

@@ -1,0 +1,146 @@
+{% extends 'authentication/base.html' %}
+{% block title %}Login Page{% endblock %}
+{% block login %}
+<div class="login-body">
+  <div class="login-container" id="container">
+    <div class="form-container sign-up-container">
+      <form action="{% url 'register' %}" method="POST" class="login-form needs-validation" id="registration-form"
+        enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <h1>CREATE ACCOUNT</h1>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="text" placeholder="Name" name="username" id="username" required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="email" placeholder="Email" name="email" id="email" required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="password" placeholder="Password" name="password" id="password"
+            required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="password" placeholder="Re-Enter Password" name="password1"
+            id="password1" required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <select class="form-control mb-3" name="gender" id="gender" required>
+            <option value="" disabled selected>Select Gender</option>
+            {% for choice in GENDER_CHOICES %}
+            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="text" placeholder="Age" name="age" id="age" pattern="[0-9]+"
+            required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="date" name="date_of_birth" od="date_of_birth" required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="text" placeholder="Aadhaar Number" id="aadhaar_number"
+            name="aadhaar_number" pattern="[0-9]+" required />
+        </div>
+
+        <div class="col-12">
+          <input class="form-control mb-3" type="text" placeholder="Phone Number" id="phone_number" name="phone_number"
+            pattern="[0-9]+" required />
+        </div>
+        <!--  -->
+        <div class="col-12">
+          <input class="form-control mb-3" type="file" name="id_proof" id="id_proof" accept=".jpg, .jpeg, .png, .pdf"
+            required />
+        </div>
+        <button type="submit" class="login-button">Sign Up</button>
+      </form>
+
+    </div>
+    <div class="form-container sign-in-container">
+      <form action="{% url 'login' %}" method="POST" class="login-form needs-validation" id="login-form" novalidate>
+        {% csrf_token %}
+        <h1>SIGN IN</h1>
+        <div class="col-12">
+          <input class="form-control mt-3 mb-3" type="text" placeholder="Username" name="username" required />
+        </div>
+        <div class="col-12">
+          <input class="form-control" type="password" placeholder="Password" name="password" required />
+        </div>
+        <a href="{% url 'reset-password' %}" class="reset-button">Forgot your password?</a>
+        <button type="submit" class="login-button">Sign In</button>
+      </form>
+    </div>
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1>Welcome Back!</h1>
+          <p>To keep connected with us please login with your personal info</p>
+          <button class="login-button ghost" id="signIn">Sign In</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1>Hello, Friend!</h1>
+          <p>Enter your personal details and start the journey with us</p>
+          <button class="login-button ghost" id="signUp">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock login %}
+{% block script %}
+<script>
+  // Enable Bootstrap form validation
+  (function () {
+    'use strict';
+
+    var forms = document.querySelectorAll('.needs-validation');
+
+    Array.from(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+  function handleMessages() {
+    {% if messages %}
+    {% for message in messages %}
+    {% if message.tags == 'success' %}
+    Swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: "{{ message|safe }}",
+    });
+    {% elif message.tags == 'error' %}
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: "{{ message|safe }}",
+    });
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+  }
+
+  // Call the function to handle messages when the document is ready
+  document.addEventListener("DOMContentLoaded", function () {
+    handleMessages();
+  });
+
+</script>
+
+
+{% endblock script %}

@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}HOME{% endblock title %}
+{% block index %}
+
+<div class="container-fluid p-1 m-0">
+    <div class="card bg-blur border border-white text-white" style=" height: 98vh; overflow-y: auto; ">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <div class="container-fluid text-center home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+            <p>Your Trusted Travel Partner for Memorable Adventures</p>
+        </div>
+        <h5 class="text-center mb-3 p-3 bg-blur border-bottom">CHOOSE YOUR MODE OF TRANSPORT</h5>
+        <!-- CARDS -->
+        <div class="container mt-5">
+            <div class="row cards text-center">
+                <div class="col-4">
+                    <a href="{% url 'bus-home' %}" class="card custom-card">
+                        <div class="card-background"
+                            style="background-image: url(https://img.freepik.com/premium-photo/bus-with-bright-neon-light-rides-along-city-streetgenerative-ai_391052-11683.jpg?w=740)">
+                        </div>
+                        <div class="card-content">
+                            <p>BOOK</p>
+                            <h3>A BUS TICKET</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'train-home' %}" class="card custom-card">
+                        <div class="card-background"
+                            style="background-image: url(https://img.freepik.com/free-photo/empire-state-building-train_23-2150897543.jpg)">
+                        </div>
+                        <div class="card-content">
+                            <p>BOOK</p>
+                            <h3>TRAIN TICKET</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'flight-home' %}" class="card custom-card">
+                        <div class="card-background"
+                            style="background-image: url(https://img.freepik.com/premium-photo/passengers-commercial-airplane-flying-clouds_756748-5099.jpg )">
+                        </div>
+                        <div class="card-content">
+                            <p>BOOK</p>
+                            <h3>FLIGHT TICKET</h3>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock index %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+    });
+</script>
+{% endblock %}

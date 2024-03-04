@@ -1,0 +1,207 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Administration Home{% endblock title %}
+
+{% block administration %}
+<div class="container-fluid p-1 m-0">
+    <div class="card bg-blur border text-light" style="  height: 99vh; overflow-y: auto; overflow-x: hidden; ">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <div class="container-fluid text-center home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+            <p>Your Trusted Travel Partner for Memorable Adventures</p>
+        </div>
+        <h5 class="text-center text-uppercase mb-1 p-3 bg-blur border-bottom"><strong>Analytics</strong>
+            Dashboard</h5>
+        <div class="row px-3 mt-2 dashboard">
+            <div class="col-12 mb-1 text-center">
+                <div class="card bg-blur border text-light text-center mt-2 mb-4" style=" ">
+                    <div class="card-header border-bottom">
+                        <div class="row">
+                            <div class="col mt-0">
+                                <h5 class="card-title">Overall Running Status</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- First Half -->
+                            <div class="col-4 border-end">
+                                <div class="row ">
+                                    <div class="col mt-0 ">
+                                        <h5 class="card-title ">Total Available Transport</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa-solid fa-route fa-2xl" style="color: #005eff;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="mt-1 mb-1">{{ total_running }}</h5>
+                            </div>
+                            <!-- Second Half -->
+                            <div class="col-4 border-end">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Total Running Today</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa-solid fa-route fa-2xl" style="color: #005eff;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="mt-1 mb-1">{{ total_running_today }}</h5>
+                            </div>
+                            <!-- Third Half -->
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Total Running This Week</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa-solid fa-route fa-2xl" style="color: #005eff;"></i>
+                                    </div>
+                                </div>
+                                <h5 class="mt-1 mb-1">{{ total_running_this_week }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- BUS CARD -->
+            <div class="col-sm-4 mb-1">
+                <div class="card bg-blur border text-light text-center mt-2 mb-4" style=" ">
+                    <div class="card-header border-bottom">
+                        <div class="row">
+                            <div class="col mt-0">
+                                <h5 class="card-title">Bus Running Status</h5>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa-solid fa-bus fa-xl" style="color: #005eff;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center border-bottom">
+                            <div class="col-12">
+                                <div class="col mt-0">
+                                    <table
+                                        class="table admin-table table-bordered table-dark table-hover rounded-4 table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Total</th>
+                                                <th>Today</th>
+                                                <th>This Week</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{ total_buses }}</td>
+                                                <td>{{ buses_running_today }}</td>
+                                                <td>{{ buses_running_this_week }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mt-3">
+                            <a href="{% url 'bus-index' %}" class="btn btn-custom">CHECK BUS</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FLIGHT CARD -->
+            <div class="col-sm-4 mb-1">
+                <div class="card bg-blur border text-light text-center mt-2 mb-4" style=" ">
+                    <div class="card-header border-bottom">
+                        <div class="row">
+                            <div class="col mt-0">
+                                <h5 class="card-title">Flight Status Status</h5>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa-solid fa-plane-departure fa-xl" style="color: #005eff;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center border-bottom">
+                            <div class="col-12">
+                                <div class="col mt-0">
+                                    <table
+                                        class="table admin-table table-bordered table-dark table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Total</th>
+                                                <th>Today</th>
+                                                <th>This Week</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{ total_flights }}</td>
+                                                <td>{{ flights_running_today }}</td>
+                                                <td>{{ flights_running_this_week }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mt-3">
+                            <a href="{% url 'flight-index' %}" class="btn btn-custom">CHECK FLIGHT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- TRAIN CARD -->
+            <div class="col-sm-4 mb-1">
+                <div class="card bg-blur border text-light text-center mt-2 mb-4" style=" ">
+                    <div class="card-header border-bottom">
+                        <div class="row">
+                            <div class="col mt-0">
+                                <h5 class="card-title">Train Running Status</h5>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fa-solid fa-train fa-xl" style="color: #005eff;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center border-bottom">
+                            <div class="col-12">
+                                <div class="col mt-0">
+                                    <table
+                                        class="table admin-table table-bordered table-dark table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Total</th>
+                                                <th>Today</th>
+                                                <th>This Week</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{ total_trains }}</td>
+                                                <td>{{ trains_running_today }}</td>
+                                                <td>{{ trains_running_this_week }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mt-3">
+                            <a href="{% url 'train-index' %}" class="btn btn-custom">CHECK TRAIN</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock administration %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+    });
+</script>
+{% endblock %}

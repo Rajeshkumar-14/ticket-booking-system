@@ -1,0 +1,724 @@
+{% extends 'administration/base.html' %}
+{% load static %}
+{% block title %}Flight Index{% endblock title %}
+
+
+{% block flight-index %}
+<div class="container-fluid flight-container p-1 m-0">
+    <div class="card bg-blur text-light border pb-3" style="height: 98vh; overflow-y: auto;">
+        <!-- Page Loader -->
+        {% include 'core/page-loader.html' %}
+        <div class="container-fluid text-center  home-header pt-3 border-bottom">
+            <h1>WELCOME TO LET's EXPLORE</h1>
+        </div>
+        <div class=" p-3 bg-blur border-bottom ">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6 mt-2">
+                        <h5 class="text-center ">FLIGHT MANAGEMENT</h5>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <button type="button" class="btn btn-custom create-btn btn-sm">
+                            CREATE FLIGHT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-blur border text-light mt-2 mx-2" style="height: 600px; overflow-y: auto; ">
+
+            <div class="card-header text-center border-bottom">
+                <h5 class="card-title  ">FLIGHT MANAGEMENT</h5>
+            </div>
+            <div class="card-body">
+                {% if flights %}
+
+                <table
+                    class="table text-center table-bordered admin-table rounded-2 table-dark table-hover table-striped"
+                    style="max-height: 250px; overflow: auto;">
+                    <thead>
+                        <tr>
+                            <th>Flight Number</th>
+                            <th>Flight Name</th>
+                            <th>Flight Type</th>
+                            <th>Departure Airport</th>
+                            <th>Arrival Airport</th>
+                            <th>Departure Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in flights %}
+                        <tr>
+                            <td>{{ flight.flight_number }}</td>
+                            <td>{{ flight.flight_name }}</td>
+                            <td>{{ flight.flight_type }}</td>
+                            <td>{{ flight.departure_airport }}</td>
+                            <td>{{ flight.arrival_airport }}</td>
+                            <td>{{ flight.departure_date }}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Flight Actions">
+                                    <button class="btn btn-info display-btn me-1" data-id="{{ flight.id }}"><i
+                                            class="fa-solid fa-eye"></i></button>
+                                    <button class="btn btn-info display-loader-btn d-none me-1 rounded-start-2"
+                                        type="button" disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <!--  -->
+                                    <button class="btn btn-warning edit-btn me-1" data-id="{{ flight.id }}"><i
+                                            class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn btn-warning edit-loader-btn d-none me-1" type="button" disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <!--  -->
+                                    <button class="btn btn-danger delete-loader-btn d-none rounded-end-2" type="button"
+                                        disabled>
+                                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        <span class="visually-hidden" role="status">Loading...</span>
+                                    </button>
+                                    <button class="btn btn-danger delete-btn" data-id="{{ flight.id }}"><i
+                                            class="fa-regular fa-trash-can"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="container-fluid p-5">
+                    <div class="card bg-dark text-light shadow-lg text-center p-5">
+                        <h5>Please create a flight.</h5>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="CreateModal" tabindex="-1" role="dialog" aria-labelledby="CreateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content bg-dark ">
+            <div class="modal-header text-light">
+                <h5 class="modal-title text-light" id="exampleModalLabel">CREATE FLIGHT</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'create-flight' %}" method="POST" id="Create-form" class="create-form">
+                    {% csrf_token %}
+                    <!--  -->
+                    <div class="mb-3">
+                        <div class="form-floating mb-3">
+                            <input required type="text" class="form-control" id="flight_name" name="flight_name"
+                                placeholder="FLight Name">
+                            <label for="flight_name">Flight Name</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="flight_number"
+                                        name="flight_number" placeholder="FLight Number">
+                                    <label for="flight_number">Flight Number</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="date" class="form-control" id="departure_date"
+                                        name="departure_date" placeholder="Journey Date">
+                                    <label for="departure_date">Departure Date</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="departure_airport"
+                                        name="departure_airport" placeholder="Departure Airport">
+                                    <label for="departure_airport">Departure Airport</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="max_seats" name="max_seats"
+                                        placeholder="Max Seats">
+                                    <label for="max_seats">Max Seats</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="flightType" name="flight_type" required>
+                                        <option value="" selected disabled>Select Flight Type</option>
+                                        {% for flight_type in flight_types %}
+                                        <option value="{{ flight_type.0 }}">{{ flight_type.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Flight Type</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="fare" name="fare"
+                                        placeholder="Fare">
+                                    <label for="fare">Fare</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="arrival_airport" name="arrival_airport"
+                                        placeholder="Arrival Airport">
+                                    <label for="arrival_airport">Arrival Airport</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="booking_limit"
+                                        name="booking_limit" placeholder="Booking Limit">
+                                    <label for="booking_limit">Booking Limit ( Per User )</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="text-light p-0 m-0">
+                    <div class="d-flex align-content-end justify-content-end pt-2">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-custom">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content bg-dark ">
+            <div class="modal-header text-light">
+                <h5 class="modal-title text-light" id="exampleModalLabel">UPDATE FLIGHT</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="Edit-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="hidden" class="form-control" name="edit_flight_id" placeholder="Flight Id">
+                    </div>
+
+                    <!--  -->
+                    <div class="mb-3">
+                        <div class="form-floating mb-3">
+                            <input required type="text" class="form-control" id="flight_name" name="edit_flight_name"
+                                placeholder="FLight Name">
+                            <label for="flight_name">Flight Name</label>
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="flight_number"
+                                        name="edit_flight_number" placeholder="FLight Number">
+                                    <label for="flight_number">Flight Number</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="date" class="form-control" id="departure_date"
+                                        name="edit_departure_date" placeholder="Departure Date">
+                                    <label for="departure_date">Journey Date</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="departure_airport"
+                                        name="edit_departure_airport" placeholder="Departure Airport">
+                                    <label for="departure_airport">Departure Airport</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="max_seats"
+                                        name="edit_max_seats" placeholder="Max Seats">
+                                    <label for="max_seats">Max Seats</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  -->
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <select class="form-select" id="flightType" name="edit_flight_type" required>
+                                        <option value="" selected disabled>Select Flight Type</option>
+                                        {% for flight_type in flight_types %}
+                                        <option value="{{ flight_type.0 }}">{{ flight_type.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Flight Type</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="fare" name="edit_fare"
+                                        placeholder="Fare">
+                                    <label for="fare">Fare</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="arrival_airport"
+                                        name="edit_arrival_airport" placeholder="Arrival Airport">
+                                    <label for="arrival_airport">Arrival Airport</label>
+                                </div>
+                            </div>
+                            <!--  -->
+                            <div class="mb-3">
+                                <div class="form-floating mb-3">
+                                    <input required type="number" class="form-control" id="booking_limit"
+                                        name="edit_booking_limit" placeholder="Booking Limit">
+                                    <label for="booking_limit">Booking Limit ( Per User )</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="text-light p-0 m-0">
+                    <div class="d-flex align-content-end justify-content-end pt-2">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-custom">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- DISPLAY MODAL -->
+<div class="modal fade" id="flightDetailsModal" tabindex="-1" role="dialog" aria-labelledby="flightDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content bg-dark  text-center">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="flightDetailsModalLabel">Flight Details</h5>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table admin-table table-bordered table-striped-column table-dark table-hover text-center">
+                    <tr>
+                        <th>Flight Name</th>
+                        <td id="display-flightName"></td>
+                    </tr>
+                    <tr>
+                        <th>Flight Number</th>
+                        <td id="display-flightNumber"></td>
+                    </tr>
+                    <tr>
+                        <th>Flight Type</th>
+                        <td id="display-flightType"></td>
+                    </tr>
+                    <tr>
+                        <th>Departure Date</th>
+                        <td id="display-departureDate"></td>
+                    </tr>
+                    <tr>
+                        <th>Departure Airport</th>
+                        <td id="display-departureAirport"></td>
+                    </tr>
+                    <tr>
+                        <th>Arrival Airport</th>
+                        <td id="display-arrivalAirport"></td>
+                    </tr>
+                    <tr>
+                        <th>Fare</th>
+                        <td id="display-fare"></td>
+                    </tr>
+                    <tr>
+                        <th>Booking Limit</th>
+                        <td id="display-bookingLimit"></td>
+                    </tr>
+                    <tr>
+                        <th>Max Seats</th>
+                        <td id="display-maxSeats"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.page-loader').addClass('d-none');
+        $('.create-form').trigger('reset');
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $('.create-btn').on('click', function (e) {
+            $('#CreateModal').modal('show');
+        });
+
+        // Function to get max seats based on flight type
+        function getMaxSeats(flightType) {
+            switch (flightType) {
+                case "Domestic Flight":
+                    return 200;
+                case "International Flight":
+                    return 150;
+                default:
+                    return 100;  // Default value
+            }
+        }
+        function getMaxPrice(flightType) {
+            switch (flightType) {
+                case "Domestic Flight":
+                    return 500;
+                case "International Flight":
+                    return 1500;
+                default:
+                    return 500;  // Default value
+            }
+        }
+
+        // Update fare and max_seats on flight_type change
+        $("#flightType").change(function () {
+            var selectedFlightType = $(this).val();
+            var maxSeats = getMaxSeats(selectedFlightType);
+            var maxPrice = getMaxPrice(selectedFlightType);
+            var defaultLimit = 5;
+            
+            // Set default fare and update max_seats
+            $("input[name='fare']").val(maxPrice);
+            $("input[name='max_seats']").val(maxSeats);
+            $("input[name='booking_limit']").val(defaultLimit);
+        });
+
+        // Function to show SweetAlert error
+        function showErrorAlert(message) {
+            Swal.fire({
+                title: "Error!",
+                text: message,
+                icon: "error",
+            });
+        }
+
+        // Function to validate form inputs
+        function validateForm() {
+            // Check if flight_name is empty
+            var flightName = $("input[name='flight_name']").val();
+            if (flightName.trim() === "") {
+                showErrorAlert("Flight Name cannot be empty.");
+                return false;
+            }
+
+            // Check if flight_number is empty or less than 0
+            var flightNumber = $("input[name='flight_number']").val();
+            if (flightNumber === "" || parseInt(flightNumber) < 0) {
+                showErrorAlert("Invalid Flight Number.");
+                return false;
+            }
+
+            // Check if flight_type is selected
+            var flightType = $("#flightType").val();
+            if (flightType === "") {
+                showErrorAlert("Please select a Flight Type.");
+                return false;
+            }
+
+            // Check if departure_date is empty
+            var departureDate = $("input[name='departure_date']").val();
+            if (departureDate === "") {
+                showErrorAlert("Departure Date cannot be empty.");
+                return false;
+            }
+
+            // Check if departure_airport and arrival_airport are the same
+            var departureAirport = $("input[name='departure_airport']").val();
+            var arrivalAirport = $("input[name='arrival_airport']").val();
+            if (departureAirport === "") {
+                showErrorAlert("Departure Airport cannot be empty.");
+                return false;
+            }
+            if (arrivalAirport === "") {
+                showErrorAlert("Arrival Airport cannot be empty.");
+                return false;
+            }
+            if (departureAirport.trim() === arrivalAirport.trim()) {
+                showErrorAlert("Departure Airport and Arrival Airport cannot be the same.");
+                return false;
+            }
+
+            // Check if fare, booking_limit, and max_seats are less than 0
+            var fare = $("input[name='fare']").val();
+            var bookingLimit = $("input[name='booking_limit']").val();
+            var maxSeats = $("input[name='max_seats']").val();
+            if (parseInt(fare) < 0 || parseInt(bookingLimit) < 0 || parseInt(maxSeats) < 0) {
+                showErrorAlert("Fare, Booking Limit, and Max Seats cannot be less than 0.");
+                return false;
+            }
+
+            return true;  // Form is valid
+        }
+
+        // Submit form using AJAX
+        $("#Create-form").submit(function (e) {
+            e.preventDefault();
+
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+
+            // Serialize form data
+            var formData = $(this).serialize();
+
+            // Get CSRF token from the cookie
+            const csrftoken = getCookie('csrftoken');
+
+            // Make AJAX request
+            $.ajax({
+                type: "POST",
+                url: "{% url 'create-flight' %}",
+                data: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (response) {
+                    // Show success SweetAlert
+                    Swal.fire({
+                        title: "Success!",
+                        text: 'Flight Created Successfully',
+                        icon: "success",
+                    }).then(() => {
+                        location.reload();
+                    });
+                    $('#CreateModal').modal('hide');
+                    $('.create-form').trigger('reset');
+                },
+                error: function (xhr, status, error) {
+                    // Show error SweetAlert
+                    showErrorAlert("An error occurred. Please try again.");
+                },
+            });
+        });
+
+        // EDIT MODAL
+        $('.edit-btn').on('click', function (e) {
+            var editBtn = $(this);
+            var flightId = editBtn.data('id');
+
+            editBtn.addClass('d-none');
+            editBtn.siblings('.edit-loader-btn').removeClass('d-none');
+
+            // Make AJAX request to get flight data
+            $.ajax({
+                type: "GET",
+                url: "{% url 'edit-flight' 0 %}".replace('0', flightId),
+                success: function (response) {
+                    // Set values in the form
+                    $('#Edit-form [name=edit_flight_id]').val(response.flight.id);
+                    $('#Edit-form [name=edit_flight_name]').val(response.flight.flight_name);
+                    $('#Edit-form [name=edit_flight_number]').val(response.flight.flight_number);
+                    $('#Edit-form [name=edit_flight_type]').val(response.flight.flight_type);
+                    $('#Edit-form [name=edit_departure_date]').val(response.flight.departure_date);
+                    $('#Edit-form [name=edit_departure_airport]').val(response.flight.departure_airport);
+                    $('#Edit-form [name=edit_arrival_airport]').val(response.flight.arrival_airport);
+                    $('#Edit-form [name=edit_fare]').val(response.flight.fare);
+                    $('#Edit-form [name=edit_booking_limit]').val(response.flight.booking_limit);
+                    $('#Edit-form [name=edit_max_seats]').val(response.flight.max_seats);
+
+                    $('#EditModal').modal('show');
+                    editBtn.removeClass('d-none');
+                    editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    showErrorAlert("An error occurred. Please try again.");
+                    editBtn.removeClass('d-none');
+                    editBtn.siblings('.edit-loader-btn').addClass('d-none');
+                }
+            });
+        });
+
+        $('#Edit-form').submit(function (e) {
+            e.preventDefault();
+
+            // Deserialize the serialized form data to an object
+            var formDataArray = $(this).serializeArray();
+            var formData = {};
+            for (var i = 0; i < formDataArray.length; i++) {
+                formData[formDataArray[i].name] = formDataArray[i].value;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+
+            // Add the flight_id to the formData
+            formData['flight_id'] = formData['edit_flight_id'];
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'update-flight' 0 %}".replace('0', formData['edit_flight_id']),
+                data: formData,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (response) {
+                    if (response.status === "success") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: response.message,
+                            icon: "success",
+                        }).then(() => {
+                            location.reload();
+                        });
+                        $('#EditModal').modal('hide');
+                    } else {
+                        // Show error SweetAlert
+                        showErrorAlert("An error occurred. Please try again.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Show error SweetAlert
+                    showErrorAlert("An error occurred. Please try again.");
+                },
+            });
+        });
+
+        $('.delete-btn').on('click', function () {
+            var deleteBtn = $(this);
+            var flightId = deleteBtn.data('id');
+            const csrftoken = getCookie('csrftoken');
+
+            // Show a confirmation SwalAlert
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                // If the user clicks 'Yes', proceed with the delete action
+                if (result.isConfirmed) {
+                    deleteBtn.addClass('d-none');
+                    deleteBtn.siblings('.delete-loader-btn').removeClass('d-none');
+                    // Make an AJAX request to delete the flight
+                    $.ajax({
+                        type: 'POST',
+                        url: "{% url 'delete-flight' %}",
+                        data: {
+                            'flight_id': flightId,
+                            csrfmiddlewaretoken: csrftoken
+                        },
+                        success: function (response) {
+                            // Show success SwalAlert
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                // Reload the page after successful deletion
+                                location.reload();
+                            });
+                            deleteBtn.removeClass('d-none');
+                            deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                        },
+                        error: function (xhr, status, error) {
+                            // Show error SwalAlert
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred. Please try again.',
+                                icon: 'error'
+                            });
+                            deleteBtn.removeClass('d-none');
+                            deleteBtn.siblings('.delete-loader-btn').addClass('d-none');
+                        }
+                    });
+                }
+            });
+        });
+        $('.display-btn').on('click', function () {
+            var displayBtn = $(this);
+            var flightId = displayBtn.data('id');
+            displayBtn.addClass('d-none');
+            displayBtn.siblings('.display-loader-btn').removeClass('d-none');
+            $.ajax({
+                type: "GET",
+                url: "{% url 'flight-details' 0 %}".replace('0', flightId),
+                success: function (response) {
+                    // Display flight details in a table or any other format
+                    showFlightDetails(response);
+                    displayBtn.removeClass('d-none');
+                    displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again.',
+                        icon: 'error'
+                    });
+                    displayBtn.removeClass('d-none');
+                    displayBtn.siblings('.display-loader-btn').addClass('d-none');
+                }
+            });
+        });
+
+        function showFlightDetails(flightData) {
+            // Set values in the flight details modal
+            $('#display-flightName').text(flightData.flight_name);
+            $('#display-flightNumber').text(flightData.flight_number);
+            $('#display-flightType').text(flightData.flight_type);
+            $('#display-departureDate').text(flightData.departure_date);
+            $('#display-departureAirport').text(flightData.departure_airport);
+            $('#display-arrivalAirport').text(flightData.arrival_airport);
+            $('#display-fare').text(flightData.fare);
+            $('#display-bookingLimit').text(flightData.booking_limit);
+            $('#display-maxSeats').text(flightData.max_seats);
+
+            // Show the flight details modal
+            $('#flightDetailsModal').modal('show');
+        }
+
+        String.prototype.capitalize = function () {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        };
+    });
+</script>
+
+{% endblock flight-index %}
