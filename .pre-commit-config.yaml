@@ -1,0 +1,38 @@
+repos:
+  # Merge Conflict Tester
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  # Autoflake (Removes Unused Imports)
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args: ["--remove-all-unused-imports", "--in-place", "--recursive"]
+        exclude: "(.*__init__\\.py$|alembic/env\\.py$)"
+
+  # Black Formatter (with isort)
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        args: ["--line-length=99", "--skip-string-normalization"]
+
+  # isort (Ensure Black Compatibility)
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  # Flake8 (Linting)
+  # - repo: https://github.com/pycqa/flake8
+  #   rev: 7.1.0
+  #   hooks:
+  #     - id: flake8
+  #       args: ["--max-line-length=99"]
+  #       exclude: ".*__init__\\.py$"

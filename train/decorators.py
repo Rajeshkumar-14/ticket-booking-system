@@ -1,4 +1,5 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import render
+
 
 def allowed_users(allowed_roles=[]):
     def decorator(view_func):

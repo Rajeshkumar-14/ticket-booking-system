@@ -1,18 +1,20 @@
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from core.models import Bus
-from django.http import JsonResponse
-from .models import BusReservation
-from django.views.decorators.csrf import csrf_exempt
 import json
-from .decorators import allowed_users
-from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
+
+from core.models import Bus
 from core.tasks import (
-    send_booking_confirmation_email,
     send_booking_cancellation_email,
     send_booking_cancellation_email_by_admin,
+    send_booking_confirmation_email,
 )
+
+from .decorators import allowed_users
+from .models import BusReservation
 
 __project_by__ = "RajeshKumar"
 
@@ -103,7 +105,8 @@ def save_bus_reservation(request):
             return JsonResponse(
                 {
                     "error": "Invalid data. Names, seat numbers, and id proofs must have the same length."
-                },status=400
+                },
+                status=400,
             )
 
         user_reservation_count = BusReservation.objects.filter(
@@ -114,7 +117,8 @@ def save_bus_reservation(request):
             return JsonResponse(
                 {
                     "error": f"Booking limit exceeded. You can only book {bus.booking_limit - user_reservation_count} more seats."
-                },status=400
+                },
+                status=400,
             )
 
         for i in range(len(names)):
@@ -123,27 +127,21 @@ def save_bus_reservation(request):
             id_proof = id_proofs[i]
 
             # Check for duplicate names and id_proofs
-            if BusReservation.objects.filter(
-                trip_id=trip_id, passenger_names=name
-            ).exists():
+            if BusReservation.objects.filter(trip_id=trip_id, passenger_names=name).exists():
                 return JsonResponse(
-                    {
-                        "error": f"Passenger name '{name}' is already booked on this trip."
-                    },status=400
+                    {"error": f"Passenger name '{name}' is already booked on this trip."},
+                    status=400,
                 )
 
-            if BusReservation.objects.filter(
-                trip_id=trip_id, id_proof=id_proof
-            ).exists():
+            if BusReservation.objects.filter(trip_id=trip_id, id_proof=id_proof).exists():
                 return JsonResponse(
                     {
                         "error": f"ID proof '{id_proof}' is already used for another reservation on this trip."
-                    },status=400
+                    },
+                    status=400,
                 )
 
-            if BusReservation.objects.filter(
-                trip_id=trip_id, seat_numbers=seat_number
-            ).exists():
+            if BusReservation.objects.filter(trip_id=trip_id, seat_numbers=seat_number).exists():
                 return JsonResponse({"error": f"Seat {seat_number} is already booked."})
 
             bus_reservation = BusReservation(
@@ -159,10 +157,13 @@ def save_bus_reservation(request):
 
         remaining_limit = bus.booking_limit - user_reservation_count - len(names)
         return JsonResponse(
-            {"message": "Bus reservations saved successfully.", "remaining_limit": remaining_limit},
-            status=200
+            {
+                "message": "Bus reservations saved successfully.",
+                "remaining_limit": remaining_limit,
+            },
+            status=200,
         )
-    return JsonResponse({"error": "Invalid request method."},status=403)
+    return JsonResponse({"error": "Invalid request method."}, status=403)
 
 
 @login_required(login_url="login")
@@ -219,13 +220,9 @@ def cancel_bus_trip(request):
 
         if reservations_to_cancel.exists():
             reservations_to_cancel.delete()
-            return JsonResponse(
-                {"success": "Reservations for this trip have been cancelled."}
-            )
+            return JsonResponse({"success": "Reservations for this trip have been cancelled."})
         else:
             return JsonResponse(
-                {
-                    "error": "No reservations found for this trip under the provided user account."
-                }
+                {"error": "No reservations found for this trip under the provided user account."}
             )
     return JsonResponse({"error": "Invalid request."})

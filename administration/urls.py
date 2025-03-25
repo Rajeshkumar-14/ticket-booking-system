@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 __project_by__ = "RajeshKumar"
@@ -23,9 +24,7 @@ urlpatterns = [
     path("create-flight/", views.create_flight, name="create-flight"),
     path("edit-flight/<int:flight_id>/", views.edit_flight, name="edit-flight"),
     path("update-flight/<int:flight_id>/", views.update_flight, name="update-flight"),
-    path(
-        "flight-details/<int:flight_id>/", views.flight_details, name="flight-details"
-    ),
+    path("flight-details/<int:flight_id>/", views.flight_details, name="flight-details"),
     path("delete-flight/", views.delete_flight, name="delete-flight"),
     path("flight-history/", views.flight_history, name="flight-history"),
     path(

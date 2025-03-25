@@ -1,20 +1,19 @@
-from xml.dom import ValidationErr
-from django.shortcuts import render, redirect, get_object_or_404
-from core.models import Bus, Flight, Train
-from bus.models import BusReservation
-from flight.models import FlightReservation
-from train.models import TrainReservation
-from django.http import JsonResponse
 import json
+from datetime import timedelta
+from xml.dom import ValidationErr
+
+from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
 from django.http import JsonResponse
-
-from django.db.models import Count
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from datetime import timedelta
+
+from bus.models import BusReservation
+from core.models import Bus, Flight, Train
+from flight.models import FlightReservation
+from train.models import TrainReservation
 
 from .decorators import allowed_users
-from django.contrib.auth.decorators import login_required
 
 __project_by__ = "RajeshKumar"
 
@@ -58,9 +57,7 @@ def administration(request):
         departure_date__range=[start_of_week, end_of_week]
     ).count()
     total_running = total_buses + total_flights + total_trains
-    total_running_today = (
-        buses_running_today + trains_running_today + flights_running_today
-    )
+    total_running_today = buses_running_today + trains_running_today + flights_running_today
     total_running_this_week = (
         buses_running_this_week + trains_running_this_week + flights_running_this_week
     )
@@ -159,17 +156,11 @@ def update_bus(request, bus_id):
             bus.full_clean()
             bus.save()
 
-            return JsonResponse(
-                {"status": "success", "message": "Bus updated successfully!"}
-            )
+            return JsonResponse({"status": "success", "message": "Bus updated successfully!"})
         except ValidationErr as e:
-            return JsonResponse(
-                {"status": "error", "error": e.message_dict}, status=400
-            )
+            return JsonResponse({"status": "error", "error": e.message_dict}, status=400)
     else:
-        return JsonResponse(
-            {"status": "error", "error": "Invalid request method"}, status=400
-        )
+        return JsonResponse({"status": "error", "error": "Invalid request method"}, status=400)
 
 
 @login_required(login_url="login")
@@ -225,7 +216,7 @@ def bus_history(request):
     grouped_data = {}
     for reservation, bus in zip(history, bus_info):
         if bus:
-            key = (bus.bus_name, bus.journey_date,bus.id)
+            key = (bus.bus_name, bus.journey_date, bus.id)
             if key not in grouped_data:
                 grouped_data[key] = []
             grouped_data[key].append((reservation, bus))
@@ -251,15 +242,13 @@ def bus_travel_history(request):
     grouped_data = {}
     for reservation, bus in zip(history, bus_info):
         if bus:
-            key = (bus.bus_name, bus.journey_date,bus.id)
+            key = (bus.bus_name, bus.journey_date, bus.id)
             if key not in grouped_data:
                 grouped_data[key] = []
             grouped_data[key].append((reservation, bus))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/admin/travel-history/bus-travel-history.html", context
-    )
+    return render(request, "history/admin/travel-history/bus-travel-history.html", context)
 
 
 # FLIGHT
@@ -349,17 +338,11 @@ def update_flight(request, flight_id):
             flight.full_clean()
             flight.save()
 
-            return JsonResponse(
-                {"status": "success", "message": "Flight updated successfully!"}
-            )
+            return JsonResponse({"status": "success", "message": "Flight updated successfully!"})
         except ValidationErr as e:
-            return JsonResponse(
-                {"status": "error", "error": e.message_dict}, status=400
-            )
+            return JsonResponse({"status": "error", "error": e.message_dict}, status=400)
     else:
-        return JsonResponse(
-            {"status": "error", "error": "Invalid request method"}, status=400
-        )
+        return JsonResponse({"status": "error", "error": "Invalid request method"}, status=400)
 
 
 @login_required(login_url="login")
@@ -457,9 +440,7 @@ def flight_travel_history(request):
             grouped_data[key].append((reservation, flight))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/admin/travel-history/flight-travel-history.html", context
-    )
+    return render(request, "history/admin/travel-history/flight-travel-history.html", context)
 
 
 # TRAIN:
@@ -488,7 +469,7 @@ def create_train(request):
         booking_limit = request.POST.get("booking_limit")
         max_seats = request.POST.get("max_seats")
         formated_run_daily = ""
-        if run_daily  == "on":
+        if run_daily == "on":
             formated_run_daily = True
         else:
             formated_run_daily = False
@@ -552,7 +533,7 @@ def update_train(request, train_id):
             train.booking_limit = request.POST.get("edit_booking_limit")
             train.max_seats = request.POST.get("edit_max_seats")
             formated_run_daily = ""
-            if run_daily  == "on":
+            if run_daily == "on":
                 formated_run_daily = True
             else:
                 formated_run_daily = False
@@ -560,17 +541,11 @@ def update_train(request, train_id):
             train.full_clean()
             train.save()
 
-            return JsonResponse(
-                {"status": "success", "message": "Train updated successfully!"}
-            )
+            return JsonResponse({"status": "success", "message": "Train updated successfully!"})
         except ValidationErr as e:
-            return JsonResponse(
-                {"status": "error", "error": e.message_dict}, status=400
-            )
+            return JsonResponse({"status": "error", "error": e.message_dict}, status=400)
     else:
-        return JsonResponse(
-            {"status": "error", "error": "Invalid request method"}, status=400
-        )
+        return JsonResponse({"status": "error", "error": "Invalid request method"}, status=400)
 
 
 @login_required(login_url="login")
@@ -671,6 +646,4 @@ def train_travel_history(request):
             grouped_data[key].append((reservation, train))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/admin/travel-history/train-travel-history.html", context
-    )
+    return render(request, "history/admin/travel-history/train-travel-history.html", context)

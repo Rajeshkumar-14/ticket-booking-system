@@ -1,19 +1,20 @@
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from core.models import Train
-from django.http import JsonResponse
-from .models import TrainReservation
-from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .decorators import allowed_users
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 
+from core.models import Train
 from core.tasks import (
-    send_booking_confirmation_email,
     send_booking_cancellation_email,
     send_booking_cancellation_email_by_admin,
+    send_booking_confirmation_email,
 )
+
+from .decorators import allowed_users
+from .models import TrainReservation
 
 __project_by__ = "RajeshKumar"
 
@@ -22,9 +23,7 @@ __project_by__ = "RajeshKumar"
 @allowed_users(allowed_roles=["User"])
 def train_home(request):
     train_types = Train.TRAIN_CHOICES
-    starting_points = Train.objects.values_list(
-        "departure_station", flat=True
-    ).distinct()
+    starting_points = Train.objects.values_list("departure_station", flat=True).distinct()
     ending_points = Train.objects.values_list("arrival_station", flat=True).distinct()
 
     context = {
@@ -64,9 +63,7 @@ def check_train_availability(request):
         is_train_available = False
         train_details = None
 
-    return JsonResponse(
-        {"available": is_train_available, "train_details": train_details}
-    )
+    return JsonResponse({"available": is_train_available, "train_details": train_details})
 
 
 @login_required(login_url="login")
@@ -127,19 +124,13 @@ def save_train_reservation(request):
             id_proof = id_proofs[i]
 
             # Check for duplicate names and ID proofs
-            if TrainReservation.objects.filter(
-                trip_id=trip_id, passenger_names=name
-            ).exists():
+            if TrainReservation.objects.filter(trip_id=trip_id, passenger_names=name).exists():
                 return JsonResponse(
-                    {
-                        "error": f"Passenger name '{name}' is already booked on this trip."
-                    },
+                    {"error": f"Passenger name '{name}' is already booked on this trip."},
                     status=400,
                 )
 
-            if TrainReservation.objects.filter(
-                trip_id=trip_id, id_proof=id_proof
-            ).exists():
+            if TrainReservation.objects.filter(trip_id=trip_id, id_proof=id_proof).exists():
                 return JsonResponse(
                     {
                         "error": f"ID proof '{id_proof}' is already used for another reservation on this trip."
@@ -147,9 +138,7 @@ def save_train_reservation(request):
                     status=400,
                 )
 
-            if TrainReservation.objects.filter(
-                trip_id=trip_id, seat_numbers=seat_number
-            ).exists():
+            if TrainReservation.objects.filter(trip_id=trip_id, seat_numbers=seat_number).exists():
                 return JsonResponse({"error": f"Seat {seat_number} is already booked."})
 
             train_reservation = TrainReservation(
@@ -229,13 +218,9 @@ def cancel_train_trip(request):
 
         if reservations_to_cancel.exists():
             reservations_to_cancel.delete()
-            return JsonResponse(
-                {"success": "Reservations for this trip have been cancelled."}
-            )
+            return JsonResponse({"success": "Reservations for this trip have been cancelled."})
         else:
             return JsonResponse(
-                {
-                    "error": "No reservations found for this trip under the provided user account."
-                }
+                {"error": "No reservations found for this trip under the provided user account."}
             )
     return JsonResponse({"error": "Invalid request."})

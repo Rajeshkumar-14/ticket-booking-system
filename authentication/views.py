@@ -1,19 +1,15 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User, Group
-from django.urls import reverse
-from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from django.http import JsonResponse
-from django.utils.http import urlsafe_base64_decode
-from .tasks import send_password_reset, send_welcome_email, password_change_alert
-from .models import UserProfile
-from django.core.exceptions import ObjectDoesNotExist
-
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import SetPasswordForm
-
-from .decorators import allowed_users, unauthenticated_user
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.models import Group, User
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.utils.http import urlsafe_base64_decode
+
+from .decorators import unauthenticated_user
+from .models import UserProfile
+from .tasks import password_change_alert, send_password_reset, send_welcome_email
 
 __project_by__ = "RajeshKumar"
 
@@ -29,9 +25,7 @@ def user_login(request):
         if requested_user is None:
             messages.error(request, "Username does not exist.")
         else:
-            user = authenticate(
-                request, username=requested_user.username, password=password
-            )
+            user = authenticate(request, username=requested_user.username, password=password)
             if user is not None:
                 login(request, user)
                 if user.groups.filter(name="Administration").exists():
@@ -72,29 +66,19 @@ def user_registration(request):
             messages.error(request, "Passwords do not match.")
         else:
             if User.objects.filter(username=username).exists():
-                messages.error(
-                    request, "Username is already taken. Please Sign-Up again"
-                )
+                messages.error(request, "Username is already taken. Please Sign-Up again")
             elif not Group.objects.filter(name="User").exists():
-                messages.error(
-                    request, "User Group not Created, Try again some other time."
-                )
+                messages.error(request, "User Group not Created, Try again some other time.")
             elif User.objects.filter(email=email).exists():
                 messages.error(request, "Email is already in use.")
             elif UserProfile.objects.filter(aadhaar_number=aadhaar_number).exists():
                 messages.error(request, "Aadhaar Number already exists.")
             elif UserProfile.objects.filter(phone_number=phone_number).exists():
-                messages.error(
-                    request, "Phone number already registered with another account."
-                )
+                messages.error(request, "Phone number already registered with another account.")
             elif UserProfile.objects.filter(id_proof=id_proof).exists():
-                messages.error(
-                    request, "ID Proof has been used for registration before."
-                )
+                messages.error(request, "ID Proof has been used for registration before.")
             else:
-                user = User.objects.create_user(
-                    username=username, email=email, password=password
-                )
+                user = User.objects.create_user(username=username, email=email, password=password)
                 user.save()
 
                 selected_group = Group.objects.get(name="User")
@@ -111,9 +95,7 @@ def user_registration(request):
                 )
                 user_profile.save()
                 send_welcome_email(email)
-                messages.success(
-                    request, "Registration successful. You can now log in."
-                )
+                messages.success(request, "Registration successful. You can now log in.")
                 return redirect("login")
     context = {
         "GENDER_CHOICES": GENDER_CHOICES,
@@ -154,9 +136,7 @@ def reset_confirm(request, uidb64, token):
         password1 = request.POST.get("password1")
 
         if password == password1:
-            form = SetPasswordForm(
-                user, {"new_password1": password, "new_password2": password1}
-            )
+            form = SetPasswordForm(user, {"new_password1": password, "new_password2": password1})
 
             if form.is_valid():
                 form.save()
@@ -172,9 +152,7 @@ def reset_confirm(request, uidb64, token):
                     "Invalid form data. Please correct the errors and try again.",
                 )
         else:
-            messages.error(
-                request, "Passwords do not match. Please enter matching passwords."
-            )
+            messages.error(request, "Passwords do not match. Please enter matching passwords.")
     else:
         form = SetPasswordForm(user)
 

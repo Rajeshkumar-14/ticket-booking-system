@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
-import datetime
+from django.db import models
 
 __project_by__ = "RajeshKumar"
+
 
 class Bus(models.Model):
     BUS_CHOICES = (

@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
-from django.db import models
 from django.core.validators import (
-    MaxValueValidator,
     FileExtensionValidator,
+    MaxValueValidator,
 )
+from django.db import models
+
 __project_by__ = "RajeshKumar"
+
 
 class UserProfile(models.Model):
     GENDER = (
@@ -31,9 +33,7 @@ class UserProfile(models.Model):
         upload_to="proof/",
         null=False,
         blank=False,
-        validators=[
-            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "pdf"])
-        ],
+        validators=[FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "pdf"])],
     )
 
     def __str__(self):

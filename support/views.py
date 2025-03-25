@@ -1,13 +1,13 @@
-from django.db import models
 from django.contrib import messages
-from django.shortcuts import render
-from .models import SupportMessages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django.db import models
 from django.http import JsonResponse
+from django.shortcuts import render
+from django.utils import timezone
 
 from .decorators import allowed_users
-from django.contrib.auth.decorators import login_required
+from .models import SupportMessages
 
 
 def get_admin_user():
@@ -68,8 +68,7 @@ def load_user_messages(request, user_id):
         ).order_by("timestamp")
 
         serialized_messages = [
-            {"sender": message.sender.username, "content": message.content}
-            for message in messages
+            {"sender": message.sender.username, "content": message.content} for message in messages
         ]
 
         response_data = {
@@ -112,10 +111,7 @@ def support_admin(request):
     all_messages = []
     for user in users:
         last_message = get_last_message(request.user, user)
-        all_messages.append({
-            'user': user,
-            'last_message': last_message
-        })
+        all_messages.append({'user': user, 'last_message': last_message})
 
     if selected_user_id:
         selected_user = User.objects.get(pk=selected_user_id)
@@ -132,10 +128,17 @@ def support_admin(request):
     }
     return render(request, "support/support-admin.html", context)
 
+
 def get_last_message(user1, user2):
-    return SupportMessages.objects.filter(
-        (models.Q(sender=user1) & models.Q(receiver=user2)) | (models.Q(sender=user2) & models.Q(receiver=user1))
-    ).order_by("-timestamp").first()
+    return (
+        SupportMessages.objects.filter(
+            (models.Q(sender=user1) & models.Q(receiver=user2))
+            | (models.Q(sender=user2) & models.Q(receiver=user1))
+        )
+        .order_by("-timestamp")
+        .first()
+    )
+
 
 def user_status(user):
     if user.is_authenticated:

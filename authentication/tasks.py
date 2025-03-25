@@ -1,29 +1,22 @@
-from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
-from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
-from django.utils.encoding import force_bytes
-
 from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
 from django.utils.html import strip_tags
-from celery import shared_task
+from django.utils.http import urlsafe_base64_encode
 
 __project_by__ = "RajeshKumar"
 
 
 def send_welcome_email(user_email):
     subject = "Welcome to Our Website"
-    html_message = render_to_string(
-        "email/welcome-mail.html", {"user_email": user_email}
-    )
+    html_message = render_to_string("email/welcome-mail.html", {"user_email": user_email})
     plain_message = strip_tags(html_message)
     from_email = "noreply@example.com"
     recipient_list = [user_email]
 
-    send_mail(
-        subject, plain_message, from_email, recipient_list, html_message=html_message
-    )
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
     print("Registration mail sent")
 
 
@@ -36,16 +29,12 @@ def send_password_reset(user_id):
     token = token_generator.make_token(user)
     reset_link = f"http://127.0.0.1:8000/auth/password_reset_confirm/{uidb64}/{token}/"
 
-    html_message = render_to_string(
-        "email/password-reset-mail.html", {"reset_link": reset_link}
-    )
+    html_message = render_to_string("email/password-reset-mail.html", {"reset_link": reset_link})
     from_email = "noreply@example.com"
     plain_message = strip_tags(html_message)
     user_email = user.email
     recipient_list = [user_email]
-    send_mail(
-        subject, plain_message, from_email, recipient_list, html_message=html_message
-    )
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
 
     print("Password reset email successfully sent")
 
@@ -56,7 +45,5 @@ def password_change_alert(user_email):
     plain_message = strip_tags(html_message)
     from_email = "noreply@example.com"
     recipient_list = [user_email]
-    send_mail(
-        subject, plain_message, from_email, recipient_list, html_message=html_message
-    )
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
     print("Password change alert successfully sent to", user_email)

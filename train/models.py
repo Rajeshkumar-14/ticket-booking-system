@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 __project_by__ = "RajeshKumar"
+
 
 class TrainReservation(models.Model):
     STATUS = (

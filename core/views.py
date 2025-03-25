@@ -1,12 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Bus, Flight, Train
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+
 from bus.models import BusReservation
 from flight.models import FlightReservation
 from train.models import TrainReservation
-from django.http import JsonResponse
 
 from .decorators import allowed_users
-from django.contrib.auth.decorators import login_required
+from .models import Bus, Flight, Train
 
 __project_by__ = "RajeshKumar"
 
@@ -40,9 +41,7 @@ def bus_booking_history(request):
             grouped_data[key].append((reservation, bus))
     context = {"grouped_data": grouped_data}
     print(grouped_data)
-    return render(
-        request, "history/user/booking-history/bus-booking-history.html", context
-    )
+    return render(request, "history/user/booking-history/bus-booking-history.html", context)
 
 
 @login_required(login_url="login")
@@ -67,9 +66,7 @@ def bus_travel_history(request):
                 grouped_data[key] = []
             grouped_data[key].append((reservation, bus))
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/user/travel-history/bus-travel-history.html", context
-    )
+    return render(request, "history/user/travel-history/bus-travel-history.html", context)
 
 
 def bus_reservation_details(request):
@@ -178,18 +175,14 @@ def flight_booking_history(request):
             grouped_data[key].append((reservation, flight))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/user/booking-history/flight-booking-history.html", context
-    )
+    return render(request, "history/user/booking-history/flight-booking-history.html", context)
 
 
 @login_required(login_url="login")
 @allowed_users(allowed_roles=["User"])
 def flight_travel_history(request):
     user = request.user
-    history = FlightReservation.objects.filter(
-        reservation_user=user, status="Completed"
-    )
+    history = FlightReservation.objects.filter(reservation_user=user, status="Completed")
     flight_info = []
 
     for reservation in history:
@@ -214,9 +207,7 @@ def flight_travel_history(request):
             grouped_data[key].append((reservation, flight))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/user/travel-history/flight-travel-history.html", context
-    )
+    return render(request, "history/user/travel-history/flight-travel-history.html", context)
 
 
 def flight_reservation_details(request):
@@ -326,9 +317,7 @@ def train_booking_history(request):
             grouped_data[key].append((reservation, train))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/user/booking-history/train-booking-history.html", context
-    )
+    return render(request, "history/user/booking-history/train-booking-history.html", context)
 
 
 @login_required(login_url="login")
@@ -361,9 +350,7 @@ def train_travel_history(request):
             grouped_data[key].append((reservation, train))
 
     context = {"grouped_data": grouped_data}
-    return render(
-        request, "history/user/travel-history/train-travel-history.html", context
-    )
+    return render(request, "history/user/travel-history/train-travel-history.html", context)
 
 
 def train_reservation_details(request):

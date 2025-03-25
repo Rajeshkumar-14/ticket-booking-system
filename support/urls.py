@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
@@ -7,5 +8,9 @@ urlpatterns = [
     path("load-messages/", views.load_messages, name="load-messages"),
     path('load-user-messages/<int:user_id>/', views.load_user_messages, name='load-user-messages'),
     path("clear-conversation/", views.clear_conversation, name="clear-conversation"),
-     path('clear-admin-conversation/', views.clear_admin_conversation, name='clear-admin-conversation'),
+    path(
+        'clear-admin-conversation/',
+        views.clear_admin_conversation,
+        name='clear-admin-conversation',
+    ),
 ]
