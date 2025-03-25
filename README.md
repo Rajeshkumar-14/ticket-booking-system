@@ -34,7 +34,7 @@ The All-in-One Ticket Booking System is a comprehensive web application that all
    - Create a new Conda environment:
 
      ```bash
-     conda create --name ticket-booking-system python=3.12
+     conda create --name ticket-booking-system python=3.13
      ```
 
    - Activate the Conda environment:
@@ -111,6 +111,12 @@ The All-in-One Ticket Booking System is a comprehensive web application that all
    ```bash
    python manage.py createsuperuser
    ```
+
+8. **Run Server:**
+
+  ```bash
+  python manage.py runserver
+  ```
 
 ## Usage
 
