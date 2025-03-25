@@ -426,7 +426,7 @@
             $('.reservation-loader').removeClass('d-none');
             $.ajax({
                 type: "POST",
-                url: "{% url 'save-bus-reservation' %}",
+                url: "{% url 'bus:save-bus-reservation' %}",
                 data: formData,
                 processData: false,
                 contentType: false,

@@ -70,7 +70,7 @@
             <div class="container-fluid p-5">
                 <div class="card bg-dark text-light shadow-lg text-center p-5">
                     <h5>No Flight Havn't Booked Yet.</h5>
-                    <a href="{% url 'administration-home' %}" class="btn btn-custom mt-3 btn-lg">Back to DashBoard</a>
+                    <a href="{% url 'administration:administration-home' %}" class="btn btn-custom mt-3 btn-lg">Back to DashBoard</a>
                 </div>
             </div>
             {% endif %}
@@ -102,7 +102,7 @@
                     // User confirmed the action, send the AJAX request
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'cancel-flight-reservation' %}",
+                        url: "{% url 'flight:cancel-flight-reservation' %}",
                         data: {
                             reservation_id: reservationId,
                             csrfmiddlewaretoken: "{{ csrf_token }}",
@@ -149,7 +149,7 @@
                     // User confirmed the action, send the AJAX request
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'cancel-flight-trip' %}",
+                        url: "{% url 'flight:cancel-flight-trip' %}",
                         data: {
                             trip_name: tripName,
                             flight_id: tripFlightId,

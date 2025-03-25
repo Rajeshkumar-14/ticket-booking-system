@@ -133,7 +133,7 @@
 
         function loadMessages() {
             $.ajax({
-                url: "{% url 'load-messages' %}",
+                url: "{% url 'support:load-messages' %}",
                 type: "GET",
                 success: function (data) {
                     $("#chat-box").empty();
@@ -184,7 +184,7 @@
         // Function to handle sending messages via Ajax
         $("#send-message-btn").click(function () {
             $.ajax({
-                url: "{% url 'support-home' %}",
+                url: "{% url 'support:support-home' %}",
                 type: "POST",
                 data: $("#message-form").serialize(),
                 success: function (data) {
@@ -209,7 +209,7 @@
                     // User confirmed the action, send the AJAX request
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'clear-conversation' %}",
+                        url: "{% url 'support:clear-conversation' %}",
                         data: {
                             csrfmiddlewaretoken: "{{ csrf_token }}"
                         },

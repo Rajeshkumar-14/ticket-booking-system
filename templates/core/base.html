@@ -64,14 +64,14 @@
 
           <!-- Sidebar content within a collapse div -->
           <div class="collapse show" id="sidebarCollapse">
-            <a href="{% url 'index' %}" class="text-white pe-3 mb-1 link-light text-decoration-none d-block">
+            <a href="{% url 'core:index' %}" class="text-white pe-3 mb-1 link-light text-decoration-none d-block">
               <img src="{% static 'core/images/lets-explore-logo.png' %}" class="img-fluid img" width="45">
               <span class="fs-5 fw-semibold">LET's EXPLORE</span>
             </a>
             <p class="border-bottom mb-2 p-0 m-0"></p>
             <ul class="list-unstyled">
               <li class="active">
-                <a href="{% url 'index' %}" class="btn text-white">
+                <a href="{% url 'core:index' %}" class="btn text-white">
                   <i class="fa-solid fa-home me-3"></i>
                   <span class="menu-text">Home</span>
                 </a>
@@ -85,15 +85,15 @@
                 <div class="collapse" id="ticket-collapse">
                   <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
                     <li>
-                      <a href="{% url 'bus-home' %}" class="btn text-white"><i class="fas fa-bus me-2"></i><span
+                      <a href="{% url 'bus:bus-home' %}" class="btn text-white"><i class="fas fa-bus me-2"></i><span
                           class="menu-text">Bus</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'flight-home' %}" class="btn text-white"><i class="fas fa-plane me-2"></i><span
+                      <a href="{% url 'flight:flight-home' %}" class="btn text-white"><i class="fas fa-plane me-2"></i><span
                           class="menu-text">Flight</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'train-home' %}" class="btn text-white"><i class="fas fa-train me-2"></i><span
+                      <a href="{% url 'train:train-home' %}" class="btn text-white"><i class="fas fa-train me-2"></i><span
                           class="menu-text">Train</span>
                       </a>
                     </li>
@@ -109,15 +109,15 @@
                 <div class="collapse" id="ticket-booking-collapse">
                   <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
                     <li>
-                      <a href="{% url 'bus-booking-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:bus-booking-history' %}" class="btn text-white"><i
                           class="fas fa-bus me-2"></i><span class="menu-text">Bus</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'flight-booking-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:flight-booking-history' %}" class="btn text-white"><i
                           class="fas fa-plane me-2"></i><span class="menu-text">Flight</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'train-booking-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:train-booking-history' %}" class="btn text-white"><i
                           class="fas fa-train me-2"></i><span class="menu-text">Train</span>
                       </a>
                     </li>
@@ -125,7 +125,7 @@
                 </div>
               </li>
               <li>
-                <a href="{% url 'support-home' %}" class="btn text-white">
+                <a href="{% url 'support:support-home' %}" class="btn text-white">
                   <i class="fa-solid fa-headset me-3"></i>
                   <span class="menu-text">Support</span>
                 </a>
@@ -139,15 +139,15 @@
                 <div class="collapse" id="travel-history">
                   <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
                     <li>
-                      <a href="{% url 'bus-travel-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:bus-travel-history' %}" class="btn text-white"><i
                           class="fas fa-bus me-2"></i><span class="menu-text">Bus</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'flight-travel-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:flight-travel-history' %}" class="btn text-white"><i
                           class="fas fa-plane me-2"></i><span class="menu-text">Flight</span></a>
                     </li>
                     <li>
-                      <a href="{% url 'train-travel-history' %}" class="btn text-white"><i
+                      <a href="{% url 'core:train-travel-history' %}" class="btn text-white"><i
                           class="fas fa-train me-2"></i><span class="menu-text">Train</span>
                       </a>
                     </li>
@@ -163,18 +163,18 @@
                 <div class="collapse" id="profile-collapse">
                   <ul class="btn-toggle-nav list-unstyled small" style="padding-left: 5%;">
                     <li>
-                      <a href="{% url 'user_profile' %}" class="btn text-white"><i
+                      <a href="{% url 'auth:user_profile' %}" class="btn text-white"><i
                           class="fa-solid fa-gear me-2"></i><span class="menu-text">Profile</span></a>
                     </li>
                     {% if user.is_authenticated %}
                     <li>
-                      <a href="{% url 'logout' %}" class="btn text-white"><i
+                      <a href="{% url 'auth:logout' %}" class="btn text-white"><i
                           class="fa-solid fa-arrow-right-from-bracket me-2"></i><span
                           class="menu-text">Log-Out</span></a>
                     </li>
                     {% else %}
                     <li>
-                      <a href="{% url 'login' %}" class="btn text-white"><i
+                      <a href="{% url 'auth:login' %}" class="btn text-white"><i
                           class="fa-solid fa-arrow-right-to-bracket me-2"></i><span class="menu-text">Log-In</span></a>
                     </li>
                     {% endif %}

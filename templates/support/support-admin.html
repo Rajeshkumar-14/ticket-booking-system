@@ -181,7 +181,7 @@
 
         function loadUserMessages(userId) {
             $.ajax({
-                url: `{% url 'load-user-messages' user_id=0 %}`.replace('0', userId),
+                url: `{% url 'support:load-user-messages' user_id=0 %}`.replace('0', userId),
                 type: "GET",
                 success: function (data) {
                     // Show the chat box container and hide the "Please select a chat" alert
@@ -260,7 +260,7 @@
         // Function to handle sending messages via Ajax
         $("#send-message-btn").click(function () {
             $.ajax({
-                url: "{% url 'support-admin' %}",
+                url: "{% url 'support:support-admin' %}",
                 type: "POST",
                 data: $("#message-form").serialize(),
                 success: function (data) {
@@ -294,7 +294,7 @@
                     // User confirmed the action, send the AJAX request
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'clear-admin-conversation' %}",
+                        url: "{% url 'support:clear-admin-conversation' %}",
                         data: {
                             csrfmiddlewaretoken: "{{ csrf_token }}",
                             user_id: conversationId

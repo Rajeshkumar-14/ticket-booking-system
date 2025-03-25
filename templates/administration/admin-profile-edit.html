@@ -116,7 +116,7 @@
                 var formData = $(this).serialize();
                 $.ajax({
                     type: 'POST',
-                    url: '{% url "edit_user_profile" %}',
+                    url: '{% url "auth:edit_user_profile" %}',
                     data: formData,
                     success: function (response) {
                         if (response.success) {
@@ -126,7 +126,7 @@
                                 icon: 'success',
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = '{% url "admin_profile" %}';
+                                    window.location.href = '{% url "auth:admin_profile" %}';
                                 }
                             });
                         }

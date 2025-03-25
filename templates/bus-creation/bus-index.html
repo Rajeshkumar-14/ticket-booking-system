@@ -106,7 +106,7 @@
                 <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{% url 'create-bus' %}" method="POST" id="Create-form" class="create-form">
+                <form action="{% url 'administration:create-bus' %}" method="POST" id="Create-form" class="create-form">
                     {% csrf_token %}
                     <!--  -->
                     <div class="mb-3">
@@ -513,7 +513,7 @@
             // Make AJAX request
             $.ajax({
                 type: "POST",
-                url: "{% url 'create-bus' %}",
+                url: "{% url 'administration:create-bus' %}",
                 data: formData,
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -547,7 +547,7 @@
             // Make AJAX request to get bus data
             $.ajax({
                 type: "GET",
-                url: "{% url 'edit-bus' 0 %}".replace('0', busId),
+                url: "{% url 'administration:edit-bus' 0 %}".replace('0', busId),
                 success: function (response) {
                     // Set values in the form
                     $('#Edit-form [name=edit_bus_id]').val(response.bus.id);
@@ -591,7 +591,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "{% url 'update-bus' 0 %}".replace('0', formData['edit_bus_id']),
+                url: "{% url 'administration:update-bus' 0 %}".replace('0', formData['edit_bus_id']),
                 data: formData,
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -639,7 +639,7 @@
                     // Make an AJAX request to delete the bus
                     $.ajax({
                         type: 'POST',
-                        url: "{% url 'delete-bus' %}",
+                        url: "{% url 'administration:delete-bus' %}",
                         data: {
                             'bus_id': busId,
                             csrfmiddlewaretoken: csrftoken
@@ -679,7 +679,7 @@
             displayBtn.siblings('.display-loader-btn').removeClass('d-none');
             $.ajax({
                 type: "GET",
-                url: "{% url 'bus-details' 0 %}".replace('0', busId),
+                url: "{% url 'administration:bus-details' 0 %}".replace('0', busId),
                 success: function (response) {
                     showBusDetails(response);
                     displayBtn.removeClass('d-none');

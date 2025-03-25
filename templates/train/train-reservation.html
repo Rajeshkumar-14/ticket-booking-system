@@ -98,7 +98,7 @@
     </div>
 </div>
 </div>
-<!-- Add this inside the bus-reservation block -->
+
 <div class="modal" id="userDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content bg-dark text-center">
@@ -415,12 +415,12 @@
             $('.reservation-loader').removeClass('d-none');
             $.ajax({
                 type: "POST",
-                url: "{% url 'save-train-reservation' %}",
-                data: formData, // Send data as FormData
-                processData: false, // Don't process the data
-                contentType: false, // Don't set content type
+                url: "{% url 'train:save-train-reservation' %}",
+                data: formData,
+                processData: false,
+                contentType: false,
                 headers: {
-                    "X-CSRFToken": getCookie("csrftoken"), // Include the CSRF token
+                    "X-CSRFToken": getCookie("csrftoken"),
                 },
                 success: function (response) {
                     $('#userDetailsModal').modal('hide');

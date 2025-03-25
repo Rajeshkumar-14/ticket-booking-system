@@ -70,7 +70,7 @@
             <div class="container-fluid p-5">
                 <div class="card text-light bg-dark shadow-lg text-center p-5">
                     <h5>You haven't Traveled in any Train yet.</h5>
-                    <a href="{% url 'train-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
+                    <a href="{% url 'train:train-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
                 </div>
             </div>
             {% endif %}
@@ -160,7 +160,7 @@
                                     <span class="d-block font-weight-bold">Need Help?</span>
                                     <span>
                                         <a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
                                         </a>
                                     </span>
@@ -270,7 +270,7 @@
                                     <span class="d-block font-weight-bold">Need Help?</span>
                                     <span>
                                         <a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
                                         </a>
                                     </span>
@@ -401,7 +401,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'train-reservation-history-details' %}",
+                url: "{% url 'core:train-reservation-history-details' %}",
                 data: {
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                     'trip_name': tripName,

@@ -104,7 +104,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{% url 'create-train' %}" method="POST" id="Create-form" class="create-form">
+                    <form action="{% url 'administration:create-train' %}" method="POST" id="Create-form" class="create-form">
                         {% csrf_token %}
 
                         <div class="row">
@@ -534,7 +534,7 @@
                 // Make AJAX request
                 $.ajax({
                     type: "POST",
-                    url: "{% url 'create-train' %}",
+                    url: "{% url 'administration:create-train' %}",
                     data: formData,
                     headers: {
                         'X-CSRFToken': csrftoken
@@ -569,7 +569,7 @@
                 // Make AJAX request to get train data
                 $.ajax({
                     type: "GET",
-                    url: "{% url 'edit-train' 0 %}".replace('0', trainId),
+                    url: "{% url 'administration:edit-train' 0 %}".replace('0', trainId),
                     success: function (response) {
                         // Set values in the form
                         $('#Edit-form [name=edit_train_id]').val(response.train.id);
@@ -614,7 +614,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "{% url 'update-train' 0 %}".replace('0', formData['edit_train_id']),
+                    url: "{% url 'administration:update-train' 0 %}".replace('0', formData['edit_train_id']),
                     data: formData,
                     headers: {
                         'X-CSRFToken': csrftoken
@@ -663,7 +663,7 @@
                         // Make an AJAX request to delete the train
                         $.ajax({
                             type: 'POST',
-                            url: "{% url 'delete-train' %}",
+                            url: "{% url 'administration:delete-train' %}",
                             data: {
                                 'train_id': trainId,
                                 csrfmiddlewaretoken: csrftoken
@@ -703,7 +703,7 @@
                 displayBtn.siblings('.display-loader-btn').removeClass('d-none');
                 $.ajax({
                     type: "GET",
-                    url: "{% url 'train-details' 0 %}".replace('0', trainId),
+                    url: "{% url 'administration:train-details' 0 %}".replace('0', trainId),
                     success: function (response) {
                         // Display train details in a table or any other format
                         showTrainDetails(response);

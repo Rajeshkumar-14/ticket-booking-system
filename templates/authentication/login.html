@@ -1,82 +1,64 @@
 {% extends 'authentication/base.html' %}
 {% block title %}Login Page{% endblock %}
 {% block login %}
-<div class="login-body">
+<div class="login-body d-flex justify-content-center align-items-center">
   <div class="login-container" id="container">
+    <!-- Sign-Up Form -->
     <div class="form-container sign-up-container">
-      <form action="{% url 'register' %}" method="POST" class="login-form needs-validation" id="registration-form"
+      <form action="{% url 'auth:register' %}" method="POST" class="login-form needs-validation" id="registration-form"
         enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         <h1>CREATE ACCOUNT</h1>
-        <!--  -->
-        <div class="col-12">
+        <!-- Username -->
+        <div class="col-12 position-relative">
           <input class="form-control mb-3" type="text" placeholder="Name" name="username" id="username" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <!--  -->
-        <div class="col-12">
+        <!-- Email -->
+        <div class="col-12 position-relative">
           <input class="form-control mb-3" type="email" placeholder="Email" name="email" id="email" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="password" placeholder="Password" name="password" id="password"
-            required />
+        <!-- Password -->
+        <div class="col-12 position-relative">
+          <input class="form-control mb-3" type="password" placeholder="Password" name="password" id="password" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="password" placeholder="Re-Enter Password" name="password1"
-            id="password1" required />
+        <!-- Confirm Password -->
+        <div class="col-12 position-relative">
+          <input class="form-control mb-3" type="password" placeholder="Re-Enter Password" name="password1" id="password1" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <!--  -->
-        <div class="col-12">
-          <select class="form-control mb-3" name="gender" id="gender" required>
-            <option value="" disabled selected>Select Gender</option>
-            {% for choice in GENDER_CHOICES %}
-            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="text" placeholder="Age" name="age" id="age" pattern="[0-9]+"
-            required />
-        </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="date" name="date_of_birth" od="date_of_birth" required />
-        </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="text" placeholder="Aadhaar Number" id="aadhaar_number"
-            name="aadhaar_number" pattern="[0-9]+" required />
-        </div>
-
-        <div class="col-12">
-          <input class="form-control mb-3" type="text" placeholder="Phone Number" id="phone_number" name="phone_number"
-            pattern="[0-9]+" required />
-        </div>
-        <!--  -->
-        <div class="col-12">
-          <input class="form-control mb-3" type="file" name="id_proof" id="id_proof" accept=".jpg, .jpeg, .png, .pdf"
-            required />
+        <!-- Phone Number -->
+        <div class="col-12 position-relative">
+          <input class="form-control mb-3" type="tel" placeholder="Phone Number" name="phone_number" id="phone_number" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
         <button type="submit" class="login-button">Sign Up</button>
       </form>
-
     </div>
+
+    <!-- Sign-In Form -->
     <div class="form-container sign-in-container">
-      <form action="{% url 'login' %}" method="POST" class="login-form needs-validation" id="login-form" novalidate>
+      <form action="{% url 'auth:login' %}" method="POST" class="login-form needs-validation" id="login-form" novalidate>
         {% csrf_token %}
         <h1>SIGN IN</h1>
-        <div class="col-12">
-          <input class="form-control mt-3 mb-3" type="text" placeholder="Username" name="username" required />
+        <!-- Username -->
+        <div class="col-12 position-relative">
+          <input class="form-control mt-3 mb-3" type="text" placeholder="Username" name="username" id="login-username" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <div class="col-12">
-          <input class="form-control" type="password" placeholder="Password" name="password" required />
+        <!-- Password -->
+        <div class="col-12 position-relative">
+          <input class="form-control" type="password" placeholder="Password" name="password" id="login-password" required />
+          <div class="error-message text-danger" style="font-size: 12px;"></div>
         </div>
-        <a href="{% url 'reset-password' %}" class="reset-button">Forgot your password?</a>
+        <a href="{% url 'auth:reset-password' %}" class="reset-button">Forgot your password?</a>
         <button type="submit" class="login-button">Sign In</button>
       </form>
     </div>
+
+    <!-- Overlay -->
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
@@ -93,54 +75,147 @@
     </div>
   </div>
 </div>
-
-
 {% endblock login %}
+
 {% block script %}
 <script>
-  // Enable Bootstrap form validation
-  (function () {
-    'use strict';
+// Enable client-side form validation
+(function () {
+  'use strict';
 
-    var forms = document.querySelectorAll('.needs-validation');
+  var forms = document.querySelectorAll('.needs-validation');
 
-    Array.from(forms).forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
+  Array.from(forms).forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
 
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-  function handleMessages() {
-    {% if messages %}
-    {% for message in messages %}
-    {% if message.tags == 'success' %}
-    Swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: "{{ message|safe }}",
-    });
-    {% elif message.tags == 'error' %}
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: "{{ message|safe }}",
-    });
-    {% endif %}
-    {% endfor %}
-    {% endif %}
-  }
+// Handle sliding panel animation
+$(document).ready(function () {
+  const signUpButton = $('#signUp');
+  const signInButton = $('#signIn');
+  const container = $('#container');
 
-  // Call the function to handle messages when the document is ready
-  document.addEventListener("DOMContentLoaded", function () {
-    handleMessages();
+  signUpButton.on('click', function () {
+    container.addClass('right-panel-active');
   });
 
+  signInButton.on('click', function () {
+    container.removeClass('right-panel-active');
+  });
+
+  // Handle form submission via AJAX for registration form
+  $('#registration-form').on('submit', function (e) {
+    e.preventDefault(); // Prevent page reload
+
+    // Clear previous error messages
+    $(this).find('.error-message').text('');
+    $(this).find('.form-control').removeClass('is-invalid');
+
+    // Serialize form data
+    const formData = new FormData(this);
+
+    $.ajax({
+      url: $(this).attr('action'),
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.success) {
+          // On success, show a success message and redirect
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: response.message || 'Registration successful! Please log in.',
+          }).then(() => {
+            window.location.href = "{% url 'auth:login' %}"; // Redirect to login page
+          });
+        } else {
+          // On validation error, display errors inline
+          if (response.errors) {
+            for (const [field, errors] of Object.entries(response.errors)) {
+              const inputField = $(`#registration-form [name="${field}"]`);
+              const errorContainer = inputField.next('.error-message');
+              inputField.addClass('is-invalid');
+              errorContainer.text(errors[0].message); // Display the first error message
+            }
+          }
+        }
+      },
+      error: function (xhr) {
+        // Handle server errors
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An unexpected error occurred. Please try again.',
+        });
+      }
+    });
+  });
+
+  // Handle form submission via AJAX for login form
+  $('#login-form').on('submit', function (e) {
+    e.preventDefault(); // Prevent page reload
+
+    // Clear previous error messages
+    $(this).find('.error-message').text('');
+    $(this).find('.form-control').removeClass('is-invalid');
+
+    // Serialize form data
+    const formData = new FormData(this);
+
+    $.ajax({
+      url: $(this).attr('action'),
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        if (response.success) {
+          // On success, show a success message and redirect
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: response.message || 'Login successful!',
+          }).then(() => {
+            window.location.href = response.redirect_url || '/'; // Redirect to dashboard or home
+          });
+        } else {
+          // On validation error, display errors inline
+          if (response.errors) {
+            for (const [field, errors] of Object.entries(response.errors)) {
+              const inputField = $(`#login-form [name="${field}"]`);
+              const errorContainer = inputField.next('.error-message');
+              inputField.addClass('is-invalid');
+              errorContainer.text(errors[0].message); // Display the first error message
+            }
+          } else {
+            // Handle other errors (e.g., invalid credentials)
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message || 'Invalid username or password.',
+            });
+          }
+        }
+      },
+      error: function (xhr) {
+        // Handle server errors
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An unexpected error occurred. Please try again.',
+        });
+      }
+    });
+  });
+});
 </script>
-
-
 {% endblock script %}

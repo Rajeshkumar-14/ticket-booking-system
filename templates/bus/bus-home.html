@@ -140,7 +140,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'check-bus-availability' %}",
+                url: "{% url 'bus:check-bus-availability' %}",
                 data: {
                     'start_point': start_point,
                     'end_point': end_point,
@@ -174,7 +174,7 @@
                             $('.reserve-button').click(function () {
                                 const busId = $(this).data('bus-id');
                                 // Redirect to 'bus-reservation' with the selected bus ID
-                                window.location.href = "{% url 'bus-reservation' 0 %}".replace('0', busId);
+                                window.location.href = "{% url 'bus:bus-reservation' 0 %}".replace('0', busId);
                             });
                         }
                     } else {

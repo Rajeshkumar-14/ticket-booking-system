@@ -70,7 +70,7 @@
             <div class="container-fluid p-5">
                 <div class="card bg-dark text-light shadow-lg text-center p-5">
                     <h5>You haven't Traveled in any Flight yet.</h5>
-                    <a href="{% url 'flight-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
+                    <a href="{% url 'flight:flight-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
                 </div>
             </div>
             {% endif %}
@@ -160,7 +160,7 @@
                                 <div class="d-flex flex-column justify-content-end align-items-end"><span
                                         class="d-block font-weight-bold">Need Help?</span>
                                     <span><a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i></a>
                                     </span>
                                 </div>
@@ -266,7 +266,7 @@
                                     <span class="d-block font-weight-bold">Need Help?</span>
                                     <span>
                                         <a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
                                         </a>
                                     </span>
@@ -393,7 +393,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'flight-reservation-history-details' %}",
+                url: "{% url 'core:flight-reservation-history-details' %}",
                 data: {
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                     'trip_name': tripName,

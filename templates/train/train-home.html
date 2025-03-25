@@ -141,7 +141,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'check-train-availability' %}",
+                url: "{% url 'train:check-train-availability' %}",
                 data: {
                     'start_point': departure_station,
                     'end_point': arrival_station,
@@ -174,8 +174,7 @@
                             // Attach a click event for the reservation button
                             $('.reserve-button').click(function () {
                                 const trainId = $(this).data('train-id');
-                                // Redirect to 'train-reservation' with the selected train ID
-                                window.location.href = "{% url 'train-reservation' 0 %}".replace('0', trainId);
+                                window.location.href = "{% url 'train:train-reservation' 0 %}".replace('0', trainId);
                             });
                         }
                     } else {

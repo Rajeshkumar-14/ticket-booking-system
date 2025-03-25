@@ -139,7 +139,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'check-flight-availability' %}",
+                url: "{% url 'flight:check-flight-availability' %}",
                 data: {
                     'departure': departure,
                     'destination': destination,
@@ -173,7 +173,7 @@
                             $('.reserve-button').click(function () {
                                 const flightId = $(this).data('flight-id');
                                 // Redirect to 'flight-reservation' with the selected flight ID
-                                window.location.href = "{% url 'flight-reservation' 0 %}".replace('0', flightId);
+                                window.location.href = "{% url 'flight:flight-reservation' 0 %}".replace('0', flightId);
                             });
                         }
                     } else {

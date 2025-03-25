@@ -100,7 +100,7 @@
             <div class="container-fluid p-5">
                 <div class="card bg-dark text-light shadow-lg text-center p-5">
                     <h5>You haven't Booked any Train yet.</h5>
-                    <a href="{% url 'train-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
+                    <a href="{% url 'train:train-home' %}" class="btn btn-custom mt-3 btn-lg">BOOK NOW</a>
                 </div>
             </div>
             {% endif %}
@@ -191,7 +191,7 @@
                                     <span class="d-block font-weight-bold">Need Help?</span>
                                     <span>
                                         <a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
                                         </a>
                                     </span>
@@ -301,7 +301,7 @@
                                     <span class="d-block font-weight-bold">Need Help?</span>
                                     <span>
                                         <a class="text-decoration-none text-info"
-                                            href="{% url 'support-home' %}">Contact Us
+                                            href="{% url 'support:support-home' %}">Contact Us
                                             <i class="fa-solid fa-arrow-up-right-from-square fa-xs me-1"></i>
                                         </a>
                                     </span>
@@ -442,7 +442,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "{% url 'train-reservation-details' %}",  // Assuming the URL for train details is named 'train-reservation-details'
+                url: "{% url 'core:train-reservation-details' %}",
                 data: {
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                     'trip_name': tripName,
@@ -519,7 +519,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'cancel-train-reservation' %}",
+                        url: "{% url 'train:cancel-train-reservation' %}",
                         data: {
                             reservation_id: reservationId,
                             csrfmiddlewaretoken: "{{ csrf_token }}",
@@ -571,7 +571,7 @@
                     $('.display-all-ticket-btn').addClass('disabled');
                     $.ajax({
                         type: "POST",
-                        url: "{% url 'cancel-train-trip' %}",
+                        url: "{% url 'train:cancel-train-trip' %}",
                         data: {
                             trip_name: tripName,
                             train_id: tripTrainId,
