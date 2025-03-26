@@ -1,6 +1,7 @@
 from datetime import date
-from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 __project_by__ = "RajeshKumar"
 

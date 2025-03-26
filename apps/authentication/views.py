@@ -8,7 +8,12 @@ from django.shortcuts import redirect, render
 from django.utils.http import urlsafe_base64_decode
 
 from .decorators import unauthenticated_user
-from .forms import LoginForm, ResetPasswordRequestForm, UserProfileForm, UserRegistrationForm
+from .forms import (
+    LoginForm,
+    ResetPasswordRequestForm,
+    UserProfileForm,
+    UserRegistrationForm,
+)
 from .models import UserProfile
 from .tasks import password_change_alert, send_password_reset, send_welcome_email
 
@@ -38,7 +43,9 @@ def user_login(request):
             else:
                 messages.error(request, "User not assigned to any group. Please register again.")
                 return redirect("authentication:login")
-    return render(request, "authentication/login.html", {"form": form, **_get_gender_choices_context()})
+    return render(
+        request, "authentication/login.html", {"form": form, **_get_gender_choices_context()}
+    )
 
 
 def user_logout(request):
@@ -138,6 +145,7 @@ def edit_profile(request, template_name, redirect_name):
 def user_profile_edit(request):
     return edit_profile(request, "core/user-profile-edit.html", "authentication:user_profile")
 
+
 @login_required(login_url="authentication:login")
 def admin_profile(request):
     try:
@@ -150,4 +158,6 @@ def admin_profile(request):
 
 @login_required(login_url="authentication:login")
 def admin_profile_edit(request):
-    return edit_profile(request, "administration/admin-profile-edit.html", "authentication:admin_profile")
+    return edit_profile(
+        request, "administration/admin-profile-edit.html", "authentication:admin_profile"
+    )

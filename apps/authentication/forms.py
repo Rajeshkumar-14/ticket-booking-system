@@ -40,7 +40,9 @@ class UserProfileForm(forms.ModelForm):
             "date_of_birth": cleaned_data.get("date_of_birth"),
             "aadhaar_number": cleaned_data.get("aadhaar_number"),
             "phone_number": cleaned_data.get("phone_number"),
-            "id_proof": cleaned_data.get("id_proof").name if cleaned_data.get("id_proof") else None,
+            "id_proof": (
+                cleaned_data.get("id_proof").name if cleaned_data.get("id_proof") else None
+            ),
         }
         try:
             validated_data = UserProfileValidator(**pydantic_data).model_dump(exclude_none=True)
@@ -56,13 +58,21 @@ class UserProfileForm(forms.ModelForm):
 
     def clean_aadhaar_number(self):
         aadhaar_number = self.cleaned_data.get("aadhaar_number")
-        if UserProfile.objects.filter(aadhaar_number=aadhaar_number).exclude(user=self.instance.user).exists():
+        if (
+            UserProfile.objects.filter(aadhaar_number=aadhaar_number)
+            .exclude(user=self.instance.user)
+            .exists()
+        ):
             raise forms.ValidationError("Aadhaar number already exists.")
         return aadhaar_number
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get("phone_number")
-        if UserProfile.objects.filter(phone_number=phone_number).exclude(user=self.instance.user).exists():
+        if (
+            UserProfile.objects.filter(phone_number=phone_number)
+            .exclude(user=self.instance.user)
+            .exists()
+        ):
             raise forms.ValidationError("Phone number already registered with another account.")
         return phone_number
 

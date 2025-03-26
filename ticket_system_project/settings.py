@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 import environ
 
 # Build paths inside the project
@@ -38,8 +39,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party apps
     "crispy_forms",
-    "django_redis",  # Added for Redis caching
-    "encrypted_model_fields",  # Added for encrypted fields
+    "django_redis",
+    "encrypted_model_fields",
+    "rest_framework",
+    "rest_framework_simplejwt",
     # Your apps
     "apps.authentication",
     "apps.administration",
@@ -65,6 +68,24 @@ MIDDLEWARE = [
     "custom_middleware.request_logging_middleware.RequestLoggingMiddleware",
 ]
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
 ROOT_URLCONF = "ticket_system_project.urls"
 
 TEMPLATES = [
@@ -86,7 +107,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "ticket_system_project.wsgi.application"
 ASGI_APPLICATION = "ticket_system_project.asgi.application"
 
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"]
+)
 
 # Database
 DATABASES = {
@@ -189,7 +212,7 @@ CACHES = {
         "LOCATION": env.str("REDIS_URL", default="redis://127.0.0.1:6379/1"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SOCKET_CONNECT_TIMEOUT": 5,  # Add timeout for Redis connections
+            "SOCKET_CONNECT_TIMEOUT": 5,
             "SOCKET_TIMEOUT": 5,
         },
     }
@@ -202,7 +225,7 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True  # Improve Celery startup reliability
-CELERY_TASK_TRACK_STARTED = True  # Track task start time
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes timeout for tasks
-CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60  # 25 minutes soft timeout
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60

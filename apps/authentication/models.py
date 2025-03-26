@@ -45,7 +45,7 @@ class UserProfile(models.Model):
                 message="Phone number must be a valid 10-digit Indian number starting with 6-9.",
             )
         ],
-        db_index=True, 
+        db_index=True,
     )
     id_proof = models.FileField(
         upload_to="proof/",
@@ -61,5 +61,5 @@ class UserProfile(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=["phone_number"]), 
+            models.Index(fields=["phone_number"]),
         ]
