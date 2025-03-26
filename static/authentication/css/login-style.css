@@ -2,62 +2,158 @@
 
 /* LOGIN PAGE CSS */
 body {
-    margin: 0;
-    padding: 0;
+    background: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(120deg, #000000, #2c3e50);
-    height: 100vh;
-    overflow: hidden;
-  }
-  .login-body {
-    height: 100vh;
-  }
-  .login-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-  }
-  .login-container h1 {
+    margin: -20px 0 50px;
+    height: 100%;
+    width: 100%;
+    overflow-y: hidden;
+}
+
+h1 {
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+    /* Text color */
+}
+
+h2 {
     text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  .login-form {
-    padding: 0 40px;
-    box-sizing: border-box;
-  }
-  .form-container {
+    color: #fff;
+    /* Text color */
+}
+
+p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+    color: #ccc;
+    /* Text color */
+}
+
+span {
+    font-size: 12px;
+    color: #aaa;
+    /* Text color */
+}
+
+a {
+    color: #fff;
+    /* Link color */
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.login-button {
+    border-radius: 20px;
+    border: 1px solid #472bff;
+    background-color: #472bff;
+    color: #fff;
+    /* Text color */
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+}
+
+.login-button:active {
+    transform: scale(0.95);
+}
+
+.login-button:focus {
+    outline: none;
+}
+
+.login-button.ghost {
+    background-color: transparent;
+    border-color: #fff;
+    /* Border color */
+    color: #fff;
+    /* Text color */
+}
+
+.login-form {
+    background-color: #333;
+    /* Form background color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+.login-container {
+    background-color: #444;
+    /* Container background color */
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+        0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    margin-top: 35px;
+    width: 1100px;
+    max-width: 100%;
+    height: 750px;
+}
+
+.form-container {
     position: absolute;
     top: 0;
     height: 100%;
     transition: all 0.6s ease-in-out;
-  }
-  .sign-in-container {
+}
+
+.sign-in-container {
     left: 0;
     width: 50%;
     z-index: 2;
-  }
-  .login-container.right-panel-active .sign-in-container {
+}
+
+.login-container.right-panel-active .sign-in-container {
     transform: translateX(100%);
-  }
-  .sign-up-container {
+}
+
+.sign-up-container {
     left: 0;
     width: 50%;
     opacity: 0;
     z-index: 1;
-  }
-  .login-container.right-panel-active .sign-up-container {
+}
+
+.login-container.right-panel-active .sign-up-container {
     transform: translateX(100%);
     opacity: 1;
     z-index: 5;
-  }
-  .overlay-container {
+    animation: show 0.6s;
+}
+
+@keyframes show {
+
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+.overlay-container {
     position: absolute;
     top: 0;
     left: 50%;
@@ -66,24 +162,30 @@ body {
     overflow: hidden;
     transition: transform 0.6s ease-in-out;
     z-index: 100;
-  }
-  .login-container.right-panel-active .overlay-container {
+}
+
+.login-container.right-panel-active .overlay-container {
     transform: translateX(-100%);
-  }
-  .overlay {
-    background: linear-gradient(to right, #000000, #2c3e50);
-    color: white;
+}
+
+.overlay {
+    background: #472bff;
+    /* Dark background color */
+    color: #fff;
+    /* Text color */
     position: relative;
     left: -100%;
     height: 100%;
     width: 200%;
     transform: translateX(0);
     transition: transform 0.6s ease-in-out;
-  }
-  .login-container.right-panel-active .overlay {
+}
+
+.login-container.right-panel-active .overlay {
     transform: translateX(50%);
-  }
-  .overlay-panel {
+}
+
+.overlay-panel {
     position: absolute;
     display: flex;
     align-items: center;
@@ -96,53 +198,41 @@ body {
     width: 50%;
     transform: translateX(0);
     transition: transform 0.6s ease-in-out;
-  }
-  .overlay-left {
+}
+
+.overlay-left {
     transform: translateX(-20%);
-  }
-  .login-container.right-panel-active .overlay-left {
+}
+
+.login-container.right-panel-active .overlay-left {
     transform: translateX(0);
-  }
-  .overlay-right {
+}
+
+.overlay-right {
     right: 0;
     transform: translateX(0);
-  }
-  .login-container.right-panel-active .overlay-right {
+}
+
+.login-container.right-panel-active .overlay-right {
     transform: translateX(20%);
-  }
-  .login-button {
-    border-radius: 20px;
-    border: 1px solid #2c3e50;
-    background-color: #2c3e50;
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: transform 80ms ease-in;
-    margin-top: 20px;
-  }
-  .login-button:active {
-    transform: scale(0.95);
-  }
-  .login-button:focus {
-    outline: none;
-  }
-  .login-button.ghost {
-    background-color: transparent;
-    border-color: #FFFFFF;
-  }
-  .reset-button {
-    margin-top: 20px;
-    color: #2c3e50;
-    font-size: 14px;
-    text-decoration: none;
-  }
-  .form-control.is-invalid {
-    border-color: #dc3545;
-  }
-  .error-message {
-    min-height: 20px;
-  }
+}
+
+.login-button:hover {
+    background-color: white;
+    color: #472bff;
+}
+
+.reset-button {
+    border: 1px solid transparent;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.reset-button:hover {
+    border: 1px solid #472bff;
+    padding: 5px;
+    background: white;
+    color: #472bff;
+}
+
 /* END LOGIN PAGE CSS */

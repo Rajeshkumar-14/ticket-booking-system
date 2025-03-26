@@ -1,14 +1,19 @@
 import os
 from pathlib import Path
-
 import environ
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+env = environ.Env(
+    # Define default types for environment variables to avoid type mismatches
+    DEBUG=(bool, False),
+    DJANGO_LOGLEVEL=(str, "INFO"),
+    EMAIL_PORT=(int, 587),
+    DATABASE_PORT=(str, ""),
+)
+env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Security settings
 SECRET_KEY = env.str("SECRET_KEY")
@@ -21,7 +26,7 @@ FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY")
 if not FIELD_ENCRYPTION_KEY:
     raise ValueError("FIELD_ENCRYPTION_KEY must be set in the environment variables.")
 
-ALLOWED_HOSTS = env.str("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # Application definition
 INSTALLED_APPS = [
@@ -31,6 +36,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party apps
+    "crispy_forms",
+    "django_redis",  # Added for Redis caching
+    "encrypted_model_fields",  # Added for encrypted fields
+    # Your apps
     "apps.authentication",
     "apps.administration",
     "apps.core",
@@ -38,7 +48,6 @@ INSTALLED_APPS = [
     "apps.train",
     "apps.flight",
     "apps.support",
-    "crispy_forms",
 ]
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -61,7 +70,7 @@ ROOT_URLCONF = "ticket_system_project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "DIRS": [BASE_DIR / "templates"],  # Use Path for consistency
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -75,10 +84,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ticket_system_project.wsgi.application"
-
 ASGI_APPLICATION = "ticket_system_project.asgi.application"
 
-CSRF_TRUSTED_ORIGINS = env.str("CSRF_TRUSTED_ORIGINS").split(",")
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 
 # Database
 DATABASES = {
@@ -89,6 +97,9 @@ DATABASES = {
         "PASSWORD": env.str("DATABASE_PASSWORD", default=""),
         "HOST": env.str("DATABASE_HOST", default=""),
         "PORT": env.str("DATABASE_PORT", default=""),
+        "OPTIONS": {
+            "timeout": 20,  # Add timeout for database connections
+        },
     }
 }
 
@@ -107,14 +118,14 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files
-STATIC_URL = "static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
+STATIC_URL = "/static/"  # Ensure leading slash for consistency
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "static_root"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -125,15 +136,18 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
+            "format": "[{asctime}] {levelname} {name} {message}",
             "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",  # Add date format for clarity
         },
     },
     "handlers": {
         "file": {
             "level": env.str("DJANGO_LOGLEVEL").upper(),
-            "class": "logging.FileHandler",
-            "filename": "system-log.log",
+            "class": "logging.handlers.RotatingFileHandler",  # Use RotatingFileHandler for log rotation
+            "filename": BASE_DIR / "system-log.log",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 5,
             "formatter": "verbose",
         },
         "console": {
@@ -164,6 +178,9 @@ CSRF_COOKIE_SECURE = not env.bool("DEBUG")
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+SECURE_HSTS_SECONDS = 31536000 if not env.bool("DEBUG") else 0  # 1 year for HSTS in production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Caching
 CACHES = {
@@ -172,6 +189,8 @@ CACHES = {
         "LOCATION": env.str("REDIS_URL", default="redis://127.0.0.1:6379/1"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,  # Add timeout for Redis connections
+            "SOCKET_TIMEOUT": 5,
         },
     }
 }
@@ -183,3 +202,7 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True  # Improve Celery startup reliability
+CELERY_TASK_TRACK_STARTED = True  # Track task start time
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes timeout for tasks
+CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60  # 25 minutes soft timeout
