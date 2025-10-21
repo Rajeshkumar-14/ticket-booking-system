@@ -25,7 +25,9 @@ def user_login(request):
         if requested_user is None:
             messages.error(request, "Username does not exist.")
         else:
-            user = authenticate(request, username=requested_user.username, password=password)
+            user = authenticate(
+                request, username=requested_user.username, password=password
+            )
             if user is not None:
                 login(request, user)
                 if user.groups.filter(name="Administration").exists():
@@ -66,19 +68,29 @@ def user_registration(request):
             messages.error(request, "Passwords do not match.")
         else:
             if User.objects.filter(username=username).exists():
-                messages.error(request, "Username is already taken. Please Sign-Up again")
+                messages.error(
+                    request, "Username is already taken. Please Sign-Up again"
+                )
             elif not Group.objects.filter(name="User").exists():
-                messages.error(request, "User Group not Created, Try again some other time.")
+                messages.error(
+                    request, "User Group not Created, Try again some other time."
+                )
             elif User.objects.filter(email=email).exists():
                 messages.error(request, "Email is already in use.")
             elif UserProfile.objects.filter(aadhaar_number=aadhaar_number).exists():
                 messages.error(request, "Aadhaar Number already exists.")
             elif UserProfile.objects.filter(phone_number=phone_number).exists():
-                messages.error(request, "Phone number already registered with another account.")
+                messages.error(
+                    request, "Phone number already registered with another account."
+                )
             elif UserProfile.objects.filter(id_proof=id_proof).exists():
-                messages.error(request, "ID Proof has been used for registration before.")
+                messages.error(
+                    request, "ID Proof has been used for registration before."
+                )
             else:
-                user = User.objects.create_user(username=username, email=email, password=password)
+                user = User.objects.create_user(
+                    username=username, email=email, password=password
+                )
                 user.save()
 
                 selected_group = Group.objects.get(name="User")
@@ -95,7 +107,9 @@ def user_registration(request):
                 )
                 user_profile.save()
                 send_welcome_email(email)
-                messages.success(request, "Registration successful. You can now log in.")
+                messages.success(
+                    request, "Registration successful. You can now log in."
+                )
                 return redirect("login")
     context = {
         "GENDER_CHOICES": GENDER_CHOICES,
@@ -136,7 +150,9 @@ def reset_confirm(request, uidb64, token):
         password1 = request.POST.get("password1")
 
         if password == password1:
-            form = SetPasswordForm(user, {"new_password1": password, "new_password2": password1})
+            form = SetPasswordForm(
+                user, {"new_password1": password, "new_password2": password1}
+            )
 
             if form.is_valid():
                 form.save()
@@ -152,7 +168,9 @@ def reset_confirm(request, uidb64, token):
                     "Invalid form data. Please correct the errors and try again.",
                 )
         else:
-            messages.error(request, "Passwords do not match. Please enter matching passwords.")
+            messages.error(
+                request, "Passwords do not match. Please enter matching passwords."
+            )
     else:
         form = SetPasswordForm(user)
 
@@ -195,7 +213,12 @@ def edit_user_profile(request):
 @login_required(login_url="login")
 def admin_profile(request):
     if request.method == "GET":
-        user_profile = UserProfile.objects.get(user=request.user)
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            messages.error(request, "Please complete your profile first.")
+            # You might want to redirect to a profile creation page or admin home
+            return redirect("administration-home")
         context = {"user_profile": user_profile}
         return render(request, "administration/admin-profile.html", context)
 
